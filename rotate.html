@@ -3,63 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rotate PDF - Free</title>
+<title>Rotate PDF Online - Free PDF Tools</title>
+<meta name="description" content="Turn sideways or upside-down PDF pages the right way up. Free and private.">
+<link rel="stylesheet" href="style.css">
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<style>
-  body { font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 20px; background: #f5f7fa; color: #222; }
-  h1 { font-size: 22px; }
-  nav a { margin-right: 12px; color: #2563eb; }
-  .box { background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.1); margin-top: 12px; }
-  select { width: 100%; padding: 10px; font-size: 16px; margin-top: 8px; }
-  button { width: 100%; padding: 12px; margin-top: 12px; font-size: 16px; border: 0; border-radius: 8px; background: #2563eb; color: #fff; }
-  button:disabled { background: #94a3b8; }
-  #msg { margin-top: 10px; font-size: 14px; }
-</style>
 </head>
 <body>
-  <nav><a href="index.html">Merge</a><a href="split.html">Split</a><a href="rotate.html">Rotate</a></nav>
-  <h1>Rotate PDF</h1>
-  <div class="box">
-    <p>Pick a PDF and rotate all its pages. Your file stays on your phone.</p>
-    <input type="file" id="file" accept="application/pdf">
-    <select id="angle">
-      <option value="90">Rotate right 90°</option>
-      <option value="180">Rotate 180°</option>
-      <option value="270">Rotate left 90°</option>
-    </select>
-    <button id="go" disabled>Rotate and Download</button>
+<header>
+  <div class="brand">📄 PDF Tools</div>
+  <p>Free PDF tools for students and everyone</p>
+  <div class="badges"><span>✔ 100% Free</span><span>🔒 Private</span><span>⚡ No upload</span></div>
+</header>
+<main>
+  <nav><a href="index.html">📎 Merge</a><a href="split.html">✂️ Split</a><a href="rotate.html" class=on>🔄 Rotate</a></nav>
+  <div class="card">
+    <h1>Rotate PDF</h1>
+    <p class="sub">Turn sideways or upside-down PDF pages the right way up. Free and private.</p>
+    <label class="drop"><div class="ico">📂</div><b>Tap to choose a PDF</b><small id="fname">One PDF file</small>
+      <input type="file" id="file" accept="application/pdf"></label>
+    <div class="seg">
+      <label><input type="radio" name="ang" value="90" checked><span>↻ Right 90°</span></label>
+      <label><input type="radio" name="ang" value="180"><span>⟲ 180°</span></label>
+      <label><input type="radio" name="ang" value="270"><span>↺ Left 90°</span></label>
+    </div>
+    <button class="go" id="go" disabled>Rotate and Download</button>
     <div id="msg"></div>
   </div>
-
+  <div class="card">
+    <div class="steps">
+      <div><b>1</b>Choose file</div><div><b>2</b>Tap the button</div><div><b>3</b>Download</div>
+    </div>
+  </div>
+</main>
+<footer>Your files never leave your device. Made with ❤ for students.</footer>
 <script>
-  const file = document.getElementById('file');
-  const angle = document.getElementById('angle');
-  const go = document.getElementById('go');
-  const msg = document.getElementById('msg');
 
-  file.addEventListener('change', () => { go.disabled = !file.files[0]; msg.textContent = ''; });
+function setMsg(t,c){const m=document.getElementById('msg');m.textContent=t;m.className=c||'';}
+function save(bytes,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));a.download=name;a.click();}
 
-  go.addEventListener('click', async () => {
-    try {
-      go.disabled = true;
-      msg.textContent = 'Working...';
-      const pdf = await PDFLib.PDFDocument.load(await file.files[0].arrayBuffer());
-      const add = parseInt(angle.value, 10);
-      pdf.getPages().forEach(p => {
-        const cur = p.getRotation().angle;
-        p.setRotation(PDFLib.degrees((cur + add) % 360));
-      });
-      const bytes = await pdf.save();
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-      a.download = 'rotated.pdf';
-      a.click();
-      msg.textContent = 'Done! Check your downloads.';
-    } catch (e) {
-      msg.textContent = 'Error: file may be locked or damaged.';
-    }
-    go.disabled = false;
-  });
+const file=document.getElementById('file'),go=document.getElementById('go'),fname=document.getElementById('fname');
+file.addEventListener('change',()=>{go.disabled=!file.files[0];fname.textContent=file.files[0]?'📄 '+file.files[0].name:'One PDF file';setMsg('');});
+go.addEventListener('click',async()=>{try{go.disabled=true;setMsg('Working...');
+const pdf=await PDFLib.PDFDocument.load(await file.files[0].arrayBuffer());
+const add=parseInt(document.querySelector('input[name=ang]:checked').value,10);
+pdf.getPages().forEach(p=>p.setRotation(PDFLib.degrees((p.getRotation().angle+add)%360)));
+save(await pdf.save(),'rotated.pdf');setMsg('Done! Check your downloads.','ok');}
+catch(e){setMsg('Error: file may be locked or damaged.','err');}
+go.disabled=false;});
+
 </script>
 </body>
 </html>
