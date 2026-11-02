@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Split PDF - Free</title>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 20px; background: #f5f7fa; color: #222; }
+  h1 { font-size: 22px; }
+  nav a { margin-right: 12px; color: #2563eb; }
+  .box { background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.1); margin-top: 12px; }
+  input[type=text] { width: 100%; padding: 10px; font-size: 16px; box-sizing: border-box; margin-top: 8px; }
+  button { width: 100%; padding: 12px; margin-top: 12px; font-size: 16px; border: 0; border-radius: 8px; background: #2563eb; color: #fff; }
+  button:disabled { background: #94a3b8; }
+  #msg { margin-top: 10px; font-size: 14px; }
+</style>
+</head>
+<body>
+  <nav><a href="index.html">Merge</a><a href="split.html">Split</a><a href="rotate.html">Rotate</a></nav>
+  <h1>Split PDF</h1>
+  <div class="box">
+    <p>Pick a PDF, then type the pages you want. Your file stays on your phone.</p>
+    <input type="file" id="file" accept="application/pdf">
+    <p id="info"></p>
+    <input type="text" id="range" placeholder="Pages, e.g. 1-3,5,8-10">
+    <button id="go" disabled>Extract and Download</button>
+    <div id="msg"></div>
+  </div>
+
+<script>
+  const file = document.getElementById('file');
+  const info = document.getElementById('info');
+  const range = document.getElementById('range');
+  const go = document.getElementById('go');
+  const msg = document.getElementById('msg');
+  let total = 0;
+
+  file.addEventListener('change', async () => {
+    msg.textContent = '';
+    go.disabled = true;
+    if (!file.files[0]) return;
+    try {
+      const pdf = await PDFLib.PDFDocument.load(await file.files[0].arrayBuffer());
+      total = pdf.getPageCount();
+      info.textContent = 'This PDF has ' + total + ' pages.';
+      go.disabled = false;
+    } catch (e) {
+      info.textContent = '';
+      msg.textContent = 'Error: file may be locked or damaged.';
+    }
+  });
+
+  function parseRange(text, max) {
+    const pages = [];
+    for (const part of text.split(',')) {
+      const p = part.trim();
+      if (!p) continue;
+      const m = p.match(/^(\d+)(?:-(\d+))?$/);
+      if (!m) return null;
+      const a = parseInt(m[1], 10);
+      const b = m[2] ? parseInt(m[2], 10) : a;
+      if (a < 1 || b < a || b > max) return null;
+      for (let i = a; i <= b; i++) pages.push(i - 1);
+    }
+    return pages.length ? pages : null;
+  }
+
+  go.addEventListener('click', async () => {
+    const pages = parseRange(range.value, total);
+    if (!pages) { msg.textContent = 'Enter valid pages like 1-3,5 (max ' + total + ').'; return; }
+    try {
+      go.disabled = true;
+      msg.textContent = 'Working...';
+      const src = await PDFLib.PDFDocument.load(await file.files[0].arrayBuffer());
+      const out = await PDFLib.PDFDocument.create();
+      const copied = await out.copyPages(src, pages);
+      copied.forEach(p => out.addPage(p));
+      const bytes = await out.save();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+      a.download = 'split.pdf';
+      a.click();
+      msg.textContent = 'Done! Check your downloads.';
+    } catch (e) {
+      msg.textContent = 'Error: could not process this file.';
+    }
+    go.disabled = false;
+  });
+</script>
+</body>
+</html>

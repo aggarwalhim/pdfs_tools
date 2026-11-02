@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rotate PDF - Free</title>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 20px; background: #f5f7fa; color: #222; }
+  h1 { font-size: 22px; }
+  nav a { margin-right: 12px; color: #2563eb; }
+  .box { background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.1); margin-top: 12px; }
+  select { width: 100%; padding: 10px; font-size: 16px; margin-top: 8px; }
+  button { width: 100%; padding: 12px; margin-top: 12px; font-size: 16px; border: 0; border-radius: 8px; background: #2563eb; color: #fff; }
+  button:disabled { background: #94a3b8; }
+  #msg { margin-top: 10px; font-size: 14px; }
+</style>
+</head>
+<body>
+  <nav><a href="index.html">Merge</a><a href="split.html">Split</a><a href="rotate.html">Rotate</a></nav>
+  <h1>Rotate PDF</h1>
+  <div class="box">
+    <p>Pick a PDF and rotate all its pages. Your file stays on your phone.</p>
+    <input type="file" id="file" accept="application/pdf">
+    <select id="angle">
+      <option value="90">Rotate right 90°</option>
+      <option value="180">Rotate 180°</option>
+      <option value="270">Rotate left 90°</option>
+    </select>
+    <button id="go" disabled>Rotate and Download</button>
+    <div id="msg"></div>
+  </div>
+
+<script>
+  const file = document.getElementById('file');
+  const angle = document.getElementById('angle');
+  const go = document.getElementById('go');
+  const msg = document.getElementById('msg');
+
+  file.addEventListener('change', () => { go.disabled = !file.files[0]; msg.textContent = ''; });
+
+  go.addEventListener('click', async () => {
+    try {
+      go.disabled = true;
+      msg.textContent = 'Working...';
+      const pdf = await PDFLib.PDFDocument.load(await file.files[0].arrayBuffer());
+      const add = parseInt(angle.value, 10);
+      pdf.getPages().forEach(p => {
+        const cur = p.getRotation().angle;
+        p.setRotation(PDFLib.degrees((cur + add) % 360));
+      });
+      const bytes = await pdf.save();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+      a.download = 'rotated.pdf';
+      a.click();
+      msg.textContent = 'Done! Check your downloads.';
+    } catch (e) {
+      msg.textContent = 'Error: file may be locked or damaged.';
+    }
+    go.disabled = false;
+  });
+</script>
+</body>
+</html>
