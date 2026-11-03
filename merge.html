@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merge PDF Online - Free PDF Tools</title>
+<meta name="description" content="Combine many PDFs into one file in seconds. Free, private, no sign-up.">
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">📄 PDF Tools</a></div>
+  <p>Free PDF tools for students and everyone</p>
+  <div class="badges"><span>✔ 100% Free</span><span>🔒 Private</span><span>⚡ No upload</span></div>
+</header>
+<main>
+  <nav><a href="index.html">🏠 Home</a><a href="merge.html" class=on>📎 Merge</a><a href="split.html">✂️ Split</a><a href="rotate.html">🔄 Rotate</a></nav>
+  <div class="card">
+    <h1>Merge PDF files</h1>
+    <p class="sub">Combine many PDFs into one file in seconds. Free, private, no sign-up.</p>
+    <label class="drop"><div class="ico">📂</div><b>Tap to choose PDF files</b><small>Select 2 or more PDFs</small>
+      <input type="file" id="files" accept="application/pdf" multiple></label>
+    <ul class="files" id="list"></ul>
+    <button class="go" id="go" disabled>Merge and Download</button>
+    <div id="msg"></div>
+  </div>
+  <div class="card">
+    <div class="steps">
+      <div><b>1</b>Choose file</div><div><b>2</b>Tap the button</div><div><b>3</b>Download</div>
+    </div>
+  </div>
+</main>
+<footer>Your files never leave your device. Made with ❤ for students.</footer>
+<script>
+
+function setMsg(t,c){const m=document.getElementById('msg');m.textContent=t;m.className=c||'';}
+function save(bytes,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));a.download=name;a.click();}
+
+const input=document.getElementById('files'),list=document.getElementById('list'),go=document.getElementById('go');
+input.addEventListener('change',()=>{list.innerHTML='';for(const f of input.files){const li=document.createElement('li');li.textContent='📄 '+f.name;list.appendChild(li);}go.disabled=input.files.length<2;setMsg(input.files.length<2?'Choose at least 2 PDFs.':'');});
+go.addEventListener('click',async()=>{try{go.disabled=true;setMsg('Merging...');
+const merged=await PDFLib.PDFDocument.create();
+for(const f of input.files){const pdf=await PDFLib.PDFDocument.load(await f.arrayBuffer());const pages=await merged.copyPages(pdf,pdf.getPageIndices());pages.forEach(p=>merged.addPage(p));}
+save(await merged.save(),'merged.pdf');setMsg('Done! Check your downloads.','ok');}
+catch(e){setMsg('Error: a file may be locked or damaged.','err');}
+go.disabled=input.files.length<2;});
+
+</script>
+</body>
+</html>

@@ -3,49 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Merge PDF Online - Free PDF Tools</title>
-<meta name="description" content="Combine many PDFs into one file in seconds. Free, private, no sign-up.">
+<title>Free Student Tools - PDF, Photo, Resume, Pharmacy and More</title>
+<meta name="description" content="Free tools for students: merge, split and compress PDF, photo to PDF, resume maker, pharmacy tools and more. No sign-up. Files stay on your phone.">
 <link rel="stylesheet" href="style.css">
-<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
-<body>
+<body class="hub">
 <header>
-  <div class="brand">📄 PDF Tools</div>
-  <p>Free PDF tools for students and everyone</p>
-  <div class="badges"><span>✔ 100% Free</span><span>🔒 Private</span><span>⚡ No upload</span></div>
+  <div class="brand">🧰 Free Student Tools</div>
+  <p>Tap what you want to do. Everything is free.</p>
+  <div class="badges"><span>✔ 100% Free</span><span>🔒 Private</span><span>📱 Works on phone</span></div>
 </header>
 <main>
-  <nav><a href="index.html" class=on>📎 Merge</a><a href="split.html">✂️ Split</a><a href="rotate.html">🔄 Rotate</a></nav>
-  <div class="card">
-    <h1>Merge PDF files</h1>
-    <p class="sub">Combine many PDFs into one file in seconds. Free, private, no sign-up.</p>
-    <label class="drop"><div class="ico">📂</div><b>Tap to choose PDF files</b><small>Select 2 or more PDFs</small>
-      <input type="file" id="files" accept="application/pdf" multiple></label>
-    <ul class="files" id="list"></ul>
-    <button class="go" id="go" disabled>Merge and Download</button>
-    <div id="msg"></div>
+  <h2 class="sec">PDF tools (open here)</h2>
+  <div class="grid">
+    <a class="tile " href="merge.html"><div class="ico">📎</div><b>Merge PDF</b><small>Join many PDFs into one</small></a>
+    <a class="tile " href="split.html"><div class="ico">✂️</div><b>Split PDF</b><small>Keep only some pages</small></a>
+    <a class="tile " href="rotate.html"><div class="ico">🔄</div><b>Rotate PDF</b><small>Fix sideways pages</small></a>
   </div>
-  <div class="card">
-    <div class="steps">
-      <div><b>1</b>Choose file</div><div><b>2</b>Tap the button</div><div><b>3</b>Download</div>
-    </div>
+  <h2 class="sec">More tools</h2>
+  <div class="grid">
+    <a class="tile " href="https://aggarwalhim.github.io/github.com-aggarwalhim-student-tools/pdf.html"><div class="ico">🗜️</div><b>Compress PDF</b><small>Make PDF smaller. Also page numbers and watermark</small></a>
+    <a class="tile " href="https://aggarwalhim.github.io/github.com-aggarwalhim-student-tools/files.html"><div class="ico">🖼️</div><b>Photos and Files</b><small>Photo to PDF, resize, background remover</small></a>
+    <a class="tile " href="https://aggarwalhim.github.io/github.com-aggarwalhim-student-tools/extract.html"><div class="ico">🔎</div><b>Copy Text</b><small>Get text from a photo, PDF or Word file</small></a>
+    <a class="tile " href="https://aggarwalhim.github.io/github.com-aggarwalhim-student-tools/career.html"><div class="ico">📄</div><b>Resume and Letter</b><small>Make a resume or application letter</small></a>
+    <a class="tile " href="https://aggarwalhim.github.io/github.com-aggarwalhim-student-tools/writing.html"><div class="ico">✍️</div><b>Writing Help</b><small>Citations and similarity check</small></a>
+    <a class="tile " href="https://aggarwalhim.github.io/github.com-aggarwalhim-student-tools/ppt.html"><div class="ico">📊</div><b>PPT Tools</b><small>Tools for presentations</small></a>
+    <a class="tile " href="https://aggarwalhim.github.io/github.com-aggarwalhim-student-tools/study.html"><div class="ico">📚</div><b>Study Tools</b><small>Notes, timers and study helpers</small></a>
+    <a class="tile " href="https://aggarwalhim.github.io/github.com-aggarwalhim-student-tools/pharmacy.html"><div class="ico">💊</div><b>Pharmacy Tools</b><small>For B.Pharm and D.Pharm students</small></a>
+    <a class="tile " href="https://aggarwalhim.github.io/github.com-aggarwalhim-student-tools/"><div class="ico">🧰</div><b>Quick Tools</b><small>QR code, word counter, age and unit converter</small></a>
+  </div>
+  <h2 class="sec">Prefer Telegram?</h2>
+  <div class="grid">
+    <a class="tile wide" href="https://t.me/pdf_convertingbot"><div class="ico">🤖</div><b>Use on Telegram</b><small>Send your file to our free bot and get the result in chat</small></a>
   </div>
 </main>
-<footer>Your files never leave your device. Made with ❤ for students.</footer>
-<script>
-
-function setMsg(t,c){const m=document.getElementById('msg');m.textContent=t;m.className=c||'';}
-function save(bytes,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));a.download=name;a.click();}
-
-const input=document.getElementById('files'),list=document.getElementById('list'),go=document.getElementById('go');
-input.addEventListener('change',()=>{list.innerHTML='';for(const f of input.files){const li=document.createElement('li');li.textContent='📄 '+f.name;list.appendChild(li);}go.disabled=input.files.length<2;setMsg(input.files.length<2?'Choose at least 2 PDFs.':'');});
-go.addEventListener('click',async()=>{try{go.disabled=true;setMsg('Merging...');
-const merged=await PDFLib.PDFDocument.create();
-for(const f of input.files){const pdf=await PDFLib.PDFDocument.load(await f.arrayBuffer());const pages=await merged.copyPages(pdf,pdf.getPageIndices());pages.forEach(p=>merged.addPage(p));}
-save(await merged.save(),'merged.pdf');setMsg('Done! Check your downloads.','ok');}
-catch(e){setMsg('Error: a file may be locked or damaged.','err');}
-go.disabled=input.files.length<2;});
-
-</script>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
 </body>
 </html>

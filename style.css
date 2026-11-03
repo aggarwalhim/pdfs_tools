@@ -36,3 +36,15 @@ button.go:disabled{background:#9aa3bd;box-shadow:none;cursor:not-allowed}
 .steps div{flex:1;text-align:center;font-size:13px;color:var(--muted)}
 .steps b{display:block;font-size:20px}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:8px 16px 28px}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.tile{display:block;text-decoration:none;color:var(--text);background:var(--card);border-radius:16px;padding:18px 14px;box-shadow:0 4px 18px rgba(30,36,51,.08);border:1px solid var(--line)}
+.tile:hover{border-color:var(--p1)}
+.tile .ico{font-size:30px}
+.tile b{display:block;margin-top:6px;font-size:16px}
+.tile small{display:block;color:var(--muted);font-size:13px;line-height:1.35;margin-top:2px}
+.tile.wide{grid-column:1/-1;background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;border:0}
+.tile.wide small{color:rgba(255,255,255,.88)}
+h2.sec{font-size:15px;color:var(--muted);margin:22px 4px 0;text-transform:uppercase;letter-spacing:.6px}
+@media(min-width:560px){.grid{grid-template-columns:1fr 1fr 1fr}}
+body.hub header{padding-bottom:26px}body.hub main{margin-top:0;padding-top:0}
