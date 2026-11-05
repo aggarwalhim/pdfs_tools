@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colour Picker and Gradient Maker - Free</title>
+<meta name="description" content="Pick any colour, get HEX, RGB and HSL codes, and make a gradient you can copy or download.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">🎨 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Colour Picker and Gradient Maker</h1>
+    <p class="sub">Pick any colour, get HEX, RGB and HSL codes, and make a gradient you can copy or download.</p>
+
+    <div class="tabs"><button class="on" data-tab="c">Colour picker</button><button data-tab="g">Gradient maker</button></div>
+    <div data-pane="c">
+      <input class="field" type="color" id="pick" value="#4f46e5" style="height:64px;padding:4px">
+      <div id="sw" style="height:70px;border-radius:12px;margin-top:12px;border:1px solid var(--line)"></div>
+      <div class="out"><b>HEX:</b> <span id="hex"></span> <button class="btn2" data-copy="hex">Copy</button><br>
+        <b>RGB:</b> <span id="rgb"></span> <button class="btn2" data-copy="rgb">Copy</button><br>
+        <b>HSL:</b> <span id="hsl"></span> <button class="btn2" data-copy="hsl">Copy</button></div>
+      <div class="btnrow" id="eyerow" hidden><button class="btn2" id="eye">🎯 Pick colour from screen</button></div>
+      <label class="l" for="hexin">Type a HEX code</label>
+      <input class="field" type="text" id="hexin" placeholder="#ff8800" maxlength="7">
+    </div>
+    <div data-pane="g" hidden>
+      <div class="row2">
+        <div><label class="l">Colour 1</label><input class="field" type="color" id="g1" value="#4f46e5" style="height:50px;padding:4px"></div>
+        <div><label class="l">Colour 2</label><input class="field" type="color" id="g2" value="#ec4899" style="height:50px;padding:4px"></div>
+      </div>
+      <div class="row2">
+        <div><label class="l" for="gt">Type</label><select class="field" id="gt" style="margin-top:0"><option value="linear">Straight</option><option value="radial">Circle</option></select></div>
+        <div><label class="l" for="ga">Angle: <span id="gav">90</span>°</label><input type="range" id="ga" min="0" max="360" value="90" style="width:100%"></div>
+      </div>
+      <div id="gprev" style="height:140px;border-radius:12px;margin-top:12px;border:1px solid var(--line)"></div>
+      <div class="out" id="gcss" style="font-family:monospace;font-size:13px"></div>
+      <div class="btnrow"><button class="btn2" id="gcopy">Copy CSS</button><button class="btn2" id="gpng">Download as image</button></div>
+    </div>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+tabs(document.querySelector('.card'));
+function hex2rgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(function(c){return c+c;}).join('');var n=parseInt(h,16);return [n>>16&255,n>>8&255,n&255];}
+function rgb2hsl(r,g,b){r/=255;g/=255;b/=255;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),h=0,s=0,l=(mx+mn)/2;
+  if(mx!==mn){var d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);
+    if(mx===r)h=(g-b)/d+(g<b?6:0);else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;}
+  return [Math.round(h),Math.round(s*100),Math.round(l*100)];}
+function showColour(h){var c=hex2rgb(h),hs=rgb2hsl(c[0],c[1],c[2]);
+  $('sw').style.background=h;$('hex').textContent=h.toUpperCase();
+  $('rgb').textContent='rgb('+c.join(', ')+')';$('hsl').textContent='hsl('+hs[0]+', '+hs[1]+'%, '+hs[2]+'%)';}
+$('pick').addEventListener('input',function(){showColour(this.value);$('hexin').value=this.value;});
+$('hexin').addEventListener('input',function(){var v=this.value.trim();if(!v.startsWith('#'))v='#'+v;if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){var full=v.length===4?'#'+v.slice(1).split('').map(function(c){return c+c;}).join(''):v;$('pick').value=full;showColour(full);}});
+document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var t=$(b.getAttribute('data-copy')).textContent;
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){setMsg('Copied: '+t,'ok');}).catch(function(){setMsg('Copy this by hand: '+t);});});});
+if(window.EyeDropper){$('eyerow').hidden=false;$('eye').addEventListener('click',function(){new EyeDropper().open().then(function(r){$('pick').value=r.sRGBHex;$('hexin').value=r.sRGBHex;showColour(r.sRGBHex);}).catch(function(){});});}
+showColour('#4f46e5');$('hexin').value='#4f46e5';
+function gcss(){var a=$('ga').value,t=$('gt').value;
+  return t==='linear'?'linear-gradient('+a+'deg, '+$('g1').value+', '+$('g2').value+')':'radial-gradient(circle, '+$('g1').value+', '+$('g2').value+')';}
+function gupdate(){$('gav').textContent=$('ga').value;var c=gcss();$('gprev').style.background=c;$('gcss').textContent='background: '+c+';';}
+['g1','g2','gt','ga'].forEach(function(i){$(i).addEventListener('input',gupdate);});gupdate();
+$('gcopy').addEventListener('click',function(){var t='background: '+gcss()+';';(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){setMsg('CSS copied.','ok');}).catch(function(){setMsg('Copy the code from the box above.');});});
+$('gpng').addEventListener('click',function(){var c=document.createElement('canvas');c.width=1200;c.height=700;var x=c.getContext('2d'),g;
+  if($('gt').value==='linear'){var a=($('ga').value-90)*Math.PI/180,cx=600,cy=350,L=Math.abs(1200*Math.cos(a))/2+Math.abs(700*Math.sin(a))/2;
+    g=x.createLinearGradient(cx-Math.cos(a)*L,cy-Math.sin(a)*L,cx+Math.cos(a)*L,cy+Math.sin(a)*L);}
+  else{g=x.createRadialGradient(600,350,0,600,350,700);}
+  g.addColorStop(0,$('g1').value);g.addColorStop(1,$('g2').value);x.fillStyle=g;x.fillRect(0,0,1200,700);
+  toBlob(c,'image/png').then(function(b){download(b,'gradient.png');});});
+
+</script>
+</body>
+</html>

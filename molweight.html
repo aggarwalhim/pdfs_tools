@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Molecular Weight Calculator - Chemical Formula to g/mol</title>
+<meta name="description" content="Type a chemical formula to get its molecular weight, and find how many grams to weigh for a solution.">
+<link rel="stylesheet" href="style.css">
+<script src="chem.js"></script>
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">🧪 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Molecular Weight Calculator</h1>
+    <p class="sub">Type a chemical formula to get its molecular weight, and find how many grams to weigh for a solution.</p>
+
+    <div class="tabs"><button class="on" data-tab="m">Molecular weight</button><button data-tab="w">How much to weigh</button></div>
+    <div data-pane="m">
+      <label class="l" for="f">Chemical formula</label>
+      <input class="field" type="text" id="f" value="C9H8O4" placeholder="e.g. CuSO4·5H2O" autocapitalize="off" autocomplete="off" style="margin-top:0">
+      <div class="chips" id="ex"></div>
+      <div class="big" id="mw">-</div>
+      <div id="bd"></div>
+      <p class="note">Write capital then small letters (Na, Cl, Mg). For hydrates use a dot or ·, like CuSO4.5H2O. Brackets are allowed, like Ca(OH)2.</p>
+    </div>
+    <div data-pane="w" hidden>
+      <label class="l" for="f2">Chemical formula</label>
+      <input class="field" type="text" id="f2" value="NaCl" autocapitalize="off" autocomplete="off" style="margin-top:0">
+      <div class="row2">
+        <div><label class="l" for="mol">Molarity wanted (M)</label><input class="field" type="number" id="mol" value="0.1" step="any" min="0"></div>
+        <div><label class="l" for="vol">Volume (mL)</label><input class="field" type="number" id="vol" value="100" step="any" min="0"></div>
+      </div>
+      <label class="l" for="pur">Purity (%) (100 if pure)</label>
+      <input class="field" type="number" id="pur" value="100" step="any" min="1" max="100">
+      <div class="out" id="wres">-</div>
+      <p class="note">Grams to weigh = Molarity × Volume (L) × Molecular weight ÷ (Purity ÷ 100). Dissolve in some solvent, then make up to the final volume in a volumetric flask.</p>
+    </div>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+tabs(document.querySelector('.card'));
+var EX=['H2O','NaCl','C6H12O6','C9H8O4','C8H9NO2','NaHCO3','H2SO4','KMnO4','CuSO4·5H2O','Ca(OH)2'];
+EX.forEach(function(x){var b=document.createElement('button');b.className='chip';b.style.border='0';b.style.cursor='pointer';b.textContent=x;b.onclick=function(){$('f').value=x;calc();};$('ex').appendChild(b);});
+function calc(){
+  var r=molWeight($('f').value);
+  if(r.error){$('mw').textContent='-';$('bd').innerHTML='<div class="out" style="color:var(--err)">'+esc(r.error)+'</div>';return;}
+  $('mw').textContent=r.mw.toFixed(3)+' g/mol';
+  var h='<table class="t"><tr><th>Element</th><th>Atoms</th><th>Atomic mass</th><th>Total</th><th>%</th></tr>';
+  Object.keys(r.counts).forEach(function(k){var a=BYSYM[k].mass,t=a*r.counts[k];h+='<tr><td>'+k+' ('+BYSYM[k].name+')</td><td>'+r.counts[k]+'</td><td>'+a+'</td><td>'+t.toFixed(3)+'</td><td>'+(t/r.mw*100).toFixed(2)+'</td></tr>';});
+  $('bd').innerHTML=h+'</table>';}
+function calc2(){
+  var r=molWeight($('f2').value),M=parseFloat($('mol').value),V=parseFloat($('vol').value),P=parseFloat($('pur').value)||100;
+  if(r.error){$('wres').textContent=r.error;return;}
+  if(isNaN(M)||isNaN(V)){$('wres').textContent='Fill molarity and volume.';return;}
+  var g=M*(V/1000)*r.mw/(P/100);
+  $('wres').innerHTML='Molecular weight: <b>'+r.mw.toFixed(3)+'</b> g/mol<br>Weigh <b style="font-size:22px">'+g.toFixed(4)+' g</b> ('+(g*1000).toFixed(1)+' mg)<br>Make up to <b>'+V+' mL</b> of solution.';}
+$('f').addEventListener('input',calc);['f2','mol','vol','pur'].forEach(function(i){$(i).addEventListener('input',calc2);});
+calc();calc2();
+
+</script>
+</body>
+</html>

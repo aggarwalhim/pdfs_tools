@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Random Name Picker, Dice Roller and Lucky Draw</title>
+<meta name="description" content="Pick a random name, roll dice or draw lucky winners. Fair and free.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">🎲 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Random Picker, Dice and Lucky Draw</h1>
+    <p class="sub">Pick a random name, roll dice or draw lucky winners. Fair and free.</p>
+
+    <div class="tabs"><button class="on" data-tab="p">Random picker</button><button data-tab="d">Dice</button><button data-tab="l">Lucky draw</button></div>
+    <div data-pane="p">
+      <label class="l" for="plist">Write one name or option on each line</label>
+      <textarea class="field" id="plist" placeholder="Amit&#10;Priya&#10;Rahul"></textarea>
+      <div class="big" id="pres">?</div>
+      <button class="go" id="ppick">Pick one</button>
+    </div>
+    <div data-pane="d" hidden>
+      <div class="row2">
+        <div><label class="l" for="dn">How many dice</label><select class="field" id="dn" style="margin-top:0"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
+        <div><label class="l" for="ds">Sides</label><select class="field" id="ds" style="margin-top:0"><option>6</option><option>4</option><option>8</option><option>10</option><option>12</option><option>20</option><option>100</option></select></div>
+      </div>
+      <div class="big" id="dres">🎲</div>
+      <div class="note" id="dsum" style="text-align:center"></div>
+      <button class="go" id="droll">Roll</button>
+    </div>
+    <div data-pane="l" hidden>
+      <label class="l" for="llist">Names (one on each line)</label>
+      <textarea class="field" id="llist" placeholder="Name 1&#10;Name 2&#10;Name 3&#10;Name 4"></textarea>
+      <label class="l" for="lw">How many winners</label>
+      <input class="field" type="number" id="lw" value="1" min="1" max="100">
+      <div class="out" id="lres">Winners will show here.</div>
+      <button class="go" id="ldraw">Draw winners</button>
+    </div>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+tabs(document.querySelector('.card'));
+function rnd(n){var a=new Uint32Array(1),lim=Math.floor(4294967296/n)*n,v;do{crypto.getRandomValues(a);v=a[0];}while(v>=lim);return v%n;}
+function lines(id){return $(id).value.split('\n').map(function(s){return s.trim();}).filter(Boolean);}
+$('ppick').addEventListener('click',function(){var l=lines('plist');if(!l.length){setMsg('Add at least one name.','err');return;}setMsg('');
+  var n=0,t=setInterval(function(){$('pres').textContent=l[rnd(l.length)];if(++n>12){clearInterval(t);$('pres').textContent=l[rnd(l.length)];}},60);});
+$('droll').addEventListener('click',function(){var n=+$('dn').value,s=+$('ds').value,r=[],sum=0;for(var i=0;i<n;i++){var v=rnd(s)+1;r.push(v);sum+=v;}
+  var faces=['','⚀','⚁','⚂','⚃','⚄','⚅'];$('dres').textContent=r.map(function(v){return (s===6)?faces[v]:v;}).join(' ');
+  $('dsum').textContent=n>1?('Values: '+r.join(' + ')+' = '+sum):('You got '+r[0]);});
+$('ldraw').addEventListener('click',function(){var l=lines('llist'),k=Math.min(+$('lw').value||1,l.length);if(!l.length){setMsg('Add some names first.','err');return;}setMsg('');
+  var a=l.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1),t=a[i];a[i]=a[j];a[j]=t;}
+  $('lres').innerHTML='<b>🏆 Winners</b><ol style="margin:6px 0 0 18px">'+a.slice(0,k).map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol>';});
+
+</script>
+</body>
+</html>

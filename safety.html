@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Safety Signs and Chemical Hazard Symbols Chart - Printable</title>
+<meta name="description" content="Chemical hazard symbols and common lab signs. Print it and put it up in your lab.">
+<link rel="stylesheet" href="style.css">
+<style>
+.gh{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:12px}
+.gc{text-align:center;border:1px solid var(--line);border-radius:12px;padding:12px 8px;break-inside:avoid}
+.dm{width:74px;height:74px;margin:10px auto 14px;transform:rotate(45deg);border:6px solid #d62828;background:#fff;display:flex;align-items:center;justify-content:center}
+.dm span{transform:rotate(-45deg);font-size:32px;line-height:1}
+.gc b{display:block;font-size:14px}.gc small{display:block;color:var(--muted);font-size:12px;line-height:1.35;margin-top:2px}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}
+.sn{border-radius:12px;padding:12px 8px;text-align:center;color:#fff;break-inside:avoid}
+.sn .e{font-size:36px;line-height:1.1}.sn b{display:block;font-size:14px;margin-top:4px}.sn small{display:block;font-size:12px;opacity:.95;line-height:1.3}
+.sn.r{background:#c62828}.sn.b{background:#1565c0}.sn.g{background:#2e7d32}.sn.y{background:#f9a825;color:#222}
+h2.hh{font-size:17px;margin:20px 0 0}
+@media print{.dm{border-color:#d62828!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.sn{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">⚠️ tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Lab Safety Signs Chart</h1>
+    <p class="sub">Chemical hazard symbols and common lab signs. Print it and put it up in your lab.</p>
+
+    <div class="btnrow noprint"><button class="btn2" onclick="window.print()">🖨️ Print this chart (A4)</button></div>
+    <h2 class="hh">Chemical hazard pictograms (GHS)</h2>
+    <p class="note" style="margin-top:2px">Look for these diamond signs on chemical bottles.</p>
+    <div class="gh" id="gh"></div>
+    <h2 class="hh">Lab safety signs</h2>
+    <div class="sg" id="sg"></div>
+    <div class="warn">Pictograms here are simplified drawings to help learning. Real labels on chemical bottles follow the official GHS pictograms. Read the bottle label and the safety data sheet (SDS) before using any chemical.</div>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+var GH=[
+['💥','Explosive','May explode with heat, shock or friction. Keep away from heat and sparks.'],
+['🔥','Flammable','Catches fire easily. Keep away from flames and sparks.'],
+['⭕','Oxidising','Helps other things burn. Keep away from flammable material.'],
+['🛢️','Gas under pressure','Cylinder may explode if heated. Store upright and fixed.'],
+['🧪','Corrosive','Burns skin and eyes and damages metals. Wear gloves and goggles.'],
+['☠️','Very toxic','Can kill if swallowed, breathed or touched. Avoid all contact.'],
+['❗','Irritant / Harmful','Irritates skin and eyes or is harmful in other ways. Avoid contact.'],
+['🫁','Serious health hazard','May cause cancer, organ damage or breathing problems over time.'],
+['🐟','Hazard to environment','Harmful to water life. Do not pour down the drain.']];
+var SG=[
+['r','🚭','No smoking','Smoking is not allowed in the lab.'],
+['r','🚫','No food or drink','Never eat or drink in the lab.'],
+['r','📵','No mobile phone','Keep phones away from chemical work areas.'],
+['r','🔥','No open flame','Flammable materials in use.'],
+['b','🥼','Wear lab coat','Wear a clean, buttoned lab coat.'],
+['b','🥽','Wear safety goggles','Protect your eyes.'],
+['b','🧤','Wear gloves','Use gloves for chemicals and sharp items.'],
+['b','🧼','Wash your hands','Wash hands before leaving the lab.'],
+['g','🚿','Safety shower / eyewash','Know where it is and keep the way clear.'],
+['g','⛑️','First aid','First aid box is here.'],
+['g','🚪','Emergency exit','Keep the exit door clear.'],
+['g','🧯','Fire extinguisher','Know how to use it (PASS: Pull, Aim, Squeeze, Sweep).'],
+['y','⚡','Electric shock','Do not touch with wet hands.'],
+['y','♨️','Hot surface','Hot plate, oven or water bath.'],
+['y','☣️','Biohazard','Handle microbes and biological waste with care.'],
+['y','☢️','Radiation','Radioactive material. Follow the rules.'],
+['y','⚠️','Caution: glass','Broken glass and sharp objects. Use the sharps bin.'],
+['y','💨','Use fume hood','Toxic fumes. Work inside the fume hood.']];
+$('gh').innerHTML=GH.map(function(g){return '<div class="gc"><div class="dm"><span>'+g[0]+'</span></div><b>'+g[1]+'</b><small>'+g[2]+'</small></div>';}).join('');
+$('sg').innerHTML=SG.map(function(s){return '<div class="sn '+s[0]+'"><div class="e">'+s[1]+'</div><b>'+s[2]+'</b><small>'+s[3]+'</small></div>';}).join('');
+
+</script>
+</body>
+</html>

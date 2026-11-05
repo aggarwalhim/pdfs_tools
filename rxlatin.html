@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pharmaceutical Latin and Rx Abbreviations - Learn and Quiz</title>
+<meta name="description" content="Learn prescription short forms like b.i.d., a.c. and p.r.n. with Latin meaning, then take a quiz.">
+<link rel="stylesheet" href="style.css">
+<script>var RX=[["a.c.", "ante cibum", "Before meals"], ["p.c.", "post cibum", "After meals"], ["b.i.d. / b.d.", "bis in die", "Twice a day"], ["t.i.d. / t.d.s.", "ter in die / ter die sumendum", "Three times a day"], ["q.i.d. / q.d.s.", "quater in die / quater die sumendum", "Four times a day"], ["o.d.", "omni die", "Once a day"], ["o.m.", "omni mane", "Every morning"], ["o.n.", "omni nocte", "Every night"], ["q.h.", "quaque hora", "Every hour"], ["q.4h.", "quaque quarta hora", "Every 4 hours"], ["h.s.", "hora somni", "At bedtime"], ["p.r.n.", "pro re nata", "When required"], ["s.o.s.", "si opus sit", "If necessary"], ["stat.", "statim", "Immediately"], ["p.o.", "per os", "By mouth"], ["i.m.", "intramuscular", "Into the muscle"], ["i.v.", "intravenous", "Into the vein"], ["s.c. / s.q.", "subcutaneous", "Under the skin"], ["s.l.", "sub lingua", "Under the tongue"], ["p.r.", "per rectum", "Through the rectum"], ["p.v.", "per vaginam", "Through the vagina"], ["O.D. (eye)", "oculus dexter", "Right eye (note: o.d. in small letters means once a day)"], ["O.S.", "oculus sinister", "Left eye"], ["O.U.", "oculus uterque", "Both eyes"], ["a.d.", "auris dextra", "Right ear"], ["a.s.", "auris sinistra", "Left ear"], ["a.u.", "auris utraque", "Both ears"], ["gtt.", "gutta", "Drop"], ["aq.", "aqua", "Water"], ["aq. dest.", "aqua destillata", "Distilled water"], ["Rx", "recipe", "Take (start of a prescription)"], ["Sig. / S.", "signa", "Write (directions for the patient)"], ["cap.", "capsula", "Capsule"], ["tab.", "tabella / tabula", "Tablet"], ["syr.", "syrupus", "Syrup"], ["susp.", "suspensio", "Suspension"], ["inj.", "injectio", "Injection"], ["sol.", "solutio", "Solution"], ["ung.", "unguentum", "Ointment"], ["supp.", "suppositorium", "Suppository"], ["pulv.", "pulvis", "Powder"], ["lot.", "lotio", "Lotion"], ["garg.", "gargarisma", "Gargle"], ["mist.", "mistura", "Mixture"], ["elix.", "elixir", "Elixir"], ["emuls.", "emulsio", "Emulsion"], ["ol.", "oleum", "Oil"], ["pil.", "pilula", "Pill"], ["ft.", "fiat", "Make"], ["q.s.", "quantum sufficit", "As much as is enough"], ["q.l.", "quantum libet", "As much as you like"], ["aa.", "ana", "Of each"], ["c.", "cum", "With"], ["s.", "sine", "Without"], ["ss.", "semis", "Half"], ["m.", "misce", "Mix"], ["d.t.d.", "da tales doses", "Give of such doses"], ["rep.", "repetatur", "Let it be repeated"], ["non rep.", "non repetatur", "Do not repeat"], ["No.", "numero", "Number"], ["ad", "ad", "Up to"], ["ad lib.", "ad libitum", "As much as desired"], ["c.m.", "cochleare magnum", "Tablespoon"], ["c.p.", "cochleare parvum", "Teaspoon"], ["u.d. / ut dict.", "ut dictum", "As directed"], ["disp.", "dispensa", "Dispense"], ["NPO", "nil per os", "Nothing by mouth"], ["part. aeq.", "partes aequales", "Equal parts"], ["mane", "mane", "In the morning"], ["nocte", "nocte", "At night"]];</script>
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">℞ tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Rx Abbreviations and Pharmaceutical Latin</h1>
+    <p class="sub">Learn prescription short forms like b.i.d., a.c. and p.r.n. with Latin meaning, then take a quiz.</p>
+
+    <div class="tabs"><button class="on" data-tab="l">Learn</button><button data-tab="q">Quiz</button></div>
+    <div data-pane="l">
+      <input class="field" type="search" id="q" placeholder="Search: bid, morning, tablet..." style="margin-top:0">
+      <div id="tb"></div>
+    </div>
+    <div data-pane="q" hidden>
+      <div class="note" id="sc">Score: 0 / 0</div>
+      <div class="big" id="qa" style="font-size:34px">-</div>
+      <div class="note" style="text-align:center" id="ql"></div>
+      <div id="qo"></div>
+      <button class="go" id="qn">Next question</button>
+    </div>
+    <div class="warn">Some abbreviations are easy to confuse (for example o.d. once daily and O.D. right eye). Hospitals often ask doctors to write them in full to avoid mistakes.</div>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+tabs(document.querySelector('.card'));
+function list(){var q=$('q').value.trim().toLowerCase(),h='<table class="t"><tr><th>Short form</th><th>Latin</th><th>Meaning</th></tr>',n=0;
+  RX.forEach(function(r){if(q&&(r.join(' ').toLowerCase().indexOf(q)<0))return;n++;h+='<tr><td><b>'+esc(r[0])+'</b></td><td><i>'+esc(r[1])+'</i></td><td>'+esc(r[2])+'</td></tr>';});
+  $('tb').innerHTML=n?h+'</table>':'<div class="out">Nothing found.</div>';}
+$('q').addEventListener('input',list);list();
+var right=0,total=0,cur=null,locked=false;
+function rnd(n){return Math.floor(Math.random()*n);}
+function next(){locked=false;setMsg('');cur=RX[rnd(RX.length)];
+  var opts=[cur[2]];while(opts.length<4){var o=RX[rnd(RX.length)][2];if(opts.indexOf(o)<0)opts.push(o);}
+  opts.sort(function(){return Math.random()-.5;});
+  $('qa').textContent=cur[0];$('ql').textContent='What does it mean?';
+  $('qo').innerHTML='';opts.forEach(function(o){var b=document.createElement('button');b.className='btn2';b.style.cssText='display:block;width:100%;margin-top:8px;text-align:left';b.textContent=o;
+    b.onclick=function(){if(locked)return;locked=true;total++;
+      if(o===cur[2]){right++;b.style.background='#c8f3d3';setMsg('Correct! '+cur[0]+' = '+cur[1],'ok');}
+      else{b.style.background='#fbd0d0';setMsg('Not quite. '+cur[0]+' means: '+cur[2]+' ('+cur[1]+')','err');}
+      $('sc').textContent='Score: '+right+' / '+total;};
+    $('qo').appendChild(b);});}
+$('qn').addEventListener('click',next);next();
+
+</script>
+</body>
+</html>

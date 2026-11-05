@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pincode and IFSC Code Search - India</title>
+<meta name="description" content="Find a post office by pincode or name, and a bank branch by IFSC code.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">📮 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Pincode and IFSC Search</h1>
+    <p class="sub">Find a post office by pincode or name, and a bank branch by IFSC code.</p>
+
+    <div class="tabs"><button class="on" data-tab="p">Pincode</button><button data-tab="i">IFSC code</button></div>
+    <div data-pane="p">
+      <label class="l" for="pin">Enter 6-digit pincode, or an area / post office name</label>
+      <input class="field" type="text" id="pin" placeholder="135001 or Yamunanagar" maxlength="40">
+      <button class="go" id="pgo">Search</button>
+      <div id="pres"></div>
+    </div>
+    <div data-pane="i" hidden>
+      <label class="l" for="ifsc">Enter 11-character IFSC code</label>
+      <input class="field" type="text" id="ifsc" placeholder="SBIN0001234" maxlength="11" style="text-transform:uppercase">
+      <button class="go" id="igo">Find bank branch</button>
+      <div id="ires"></div>
+    </div>
+    <p class="note">This tool asks free public services (India Post data and Razorpay IFSC data) for the answer, so it needs internet. If they are busy, try again after a minute. Always check important details with your bank or the post office.</p>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+tabs(document.querySelector('.card'));
+function get(url){return fetch(url).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});}
+$('pgo').addEventListener('click',function(){
+  var q=$('pin').value.trim();if(!q){setMsg('Type a pincode or name.','err');return;}
+  setMsg('Searching...');$('pres').innerHTML='';
+  var url='https://api.postalpincode.in/'+(/^\d{6}$/.test(q)?'pincode/':'postoffice/')+encodeURIComponent(q);
+  get(url).then(function(d){var r=d&&d[0];
+    if(!r||r.Status!=='Success'||!r.PostOffice||!r.PostOffice.length){setMsg('Nothing found. Check the pincode or spelling.','err');return;}
+    var h='<table class="t"><tr><th>Post office</th><th>Pincode</th><th>District</th><th>State</th><th>Type</th></tr>';
+    r.PostOffice.slice(0,60).forEach(function(p){h+='<tr><td>'+esc(p.Name)+'</td><td>'+esc(p.Pincode)+'</td><td>'+esc(p.District)+'</td><td>'+esc(p.State)+'</td><td>'+esc(p.BranchType||'')+'</td></tr>';});
+    $('pres').innerHTML=h+'</table>';setMsg(r.PostOffice.length+' result(s).','ok');
+  }).catch(function(){setMsg('Could not reach the pincode service. Check your internet and try again.','err');});
+});
+$('igo').addEventListener('click',function(){
+  var c=$('ifsc').value.trim().toUpperCase();
+  if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(c)){setMsg('IFSC has 11 characters: 4 letters, then 0, then 6 letters or digits.','err');return;}
+  setMsg('Searching...');$('ires').innerHTML='';
+  fetch('https://ifsc.razorpay.com/'+c).then(function(r){if(r.status===404)throw new Error('nf');if(!r.ok)throw new Error('x');return r.json();}).then(function(b){
+    var rows=[['Bank',b.BANK],['Branch',b.BRANCH],['IFSC',b.IFSC],['MICR',b.MICR],['Address',b.ADDRESS],['City',b.CITY],['District',b.DISTRICT],['State',b.STATE],['Contact',b.CONTACT],['UPI',b.UPI?'Yes':'No'],['NEFT',b.NEFT?'Yes':'No'],['IMPS',b.IMPS?'Yes':'No'],['RTGS',b.RTGS?'Yes':'No']];
+    var h='<table class="t">';rows.forEach(function(r){if(r[1]!==undefined&&r[1]!==null&&r[1]!=='')h+='<tr><th style="width:34%">'+r[0]+'</th><td>'+esc(r[1])+'</td></tr>';});
+    $('ires').innerHTML=h+'</table>';setMsg('');
+  }).catch(function(e){setMsg(e.message==='nf'?'This IFSC code was not found.':'Could not reach the IFSC service. Check your internet and try again.','err');});
+});
+['pin','ifsc'].forEach(function(id){$(id).addEventListener('keydown',function(e){if(e.key==='Enter')$(id==='pin'?'pgo':'igo').click();});});
+
+</script>
+</body>
+</html>

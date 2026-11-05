@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hinglish to Hindi Typing - Roman to Devanagari Converter</title>
+<meta name="description" content="Type in English letters, get Hindi text. Free, no sign-up.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">🇮🇳 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Hindi Typing (Hinglish to Hindi)</h1>
+    <p class="sub">Type in English letters, get Hindi text. Free, no sign-up.</p>
+
+    <label class="l" for="src">Type in English letters (Hinglish)</label>
+    <textarea class="field" id="src" placeholder="mera naam Amit hai. main student hoon."></textarea>
+    <label class="l" for="dst">Hindi (you can edit this)</label>
+    <textarea class="field" id="dst" style="font-size:20px"></textarea>
+    <div class="btnrow"><button class="btn2" id="copy">Copy Hindi text</button><button class="btn2" id="clr">Clear</button></div>
+    <label style="display:block;margin-top:12px;font-size:14px"><input type="checkbox" id="dand" checked> Use । (purn viram) for full stop</label>
+    <div class="out" style="font-size:14px"><b>Typing tips</b><br>
+      • Long sounds: <b>aa</b>=आ/ा, <b>ee</b>=ई/ी, <b>oo</b>=ऊ/ू. Example: <b>seeta</b> → सीता<br>
+      • <b>M</b> = ं (bindu), <b>~</b> = ँ (chandrabindu), <b>H</b> = ः<br>
+      • Capital letters: <b>T D N S R</b> give ट ड ण ष ड़ (small <b>t d n s r</b> give त द न स र)<br>
+      • <b>chh</b>=छ, <b>kh gh th dh ph bh</b> = ख घ थ ध फ भ, <b>gy</b>=ज्ञ, <b>ksh</b>=क्ष<br>
+      • Two consonants together make a joined letter: <b>pyaar</b> → प्यार, <b>namaste</b> → नमस्ते</div>
+    <p class="note">This is a simple converter. For some words you may need to fix a letter by hand, because Hinglish spelling is not fixed. The box above is editable.</p>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+var CONS=[['ksh','क्ष'],['kSh','क्ष'],['chh','छ'],['Dh','ढ'],['Th','ठ'],['Rh','ढ़'],['Sh','ष'],['gy','ज्ञ'],['kh','ख'],['gh','घ'],['ch','च'],['jh','झ'],['th','थ'],['dh','ध'],['ph','फ'],['bh','भ'],['sh','श'],
+ ['k','क'],['g','ग'],['c','क'],['j','ज'],['T','ट'],['D','ड'],['N','ण'],['t','त'],['d','द'],['n','न'],['p','प'],['f','फ'],['b','ब'],['m','म'],['y','य'],['r','र'],['l','ल'],['v','व'],['w','व'],['s','स'],['h','ह'],['q','क़'],['z','ज़'],['x','क्स'],['R','ड़'],['S','ष'],['L','ळ']];
+var VOW=[['aa','ा','आ'],['ai','ै','ऐ'],['au','ौ','औ'],['ee','ी','ई'],['ii','ी','ई'],['oo','ू','ऊ'],['uu','ू','ऊ'],['a','','अ'],['i','ि','इ'],['u','ु','उ'],['e','े','ए'],['o','ो','ओ']];
+var MARK={'M':'ं','H':'ः','~':'ँ'};
+var DICT={hai:'है',hain:'हैं',main:'मैं',mein:'में',aap:'आप',aapka:'आपका',hum:'हम',tum:'तुम',mera:'मेरा',meri:'मेरी',mere:'मेरे',tera:'तेरा',teri:'तेरी',kya:'क्या',kaise:'कैसे',kaisa:'कैसा',kaisi:'कैसी',kaun:'कौन',kab:'कब',kahan:'कहाँ',kyun:'क्यों',kyon:'क्यों',nahi:'नहीं',nahin:'नहीं',haan:'हाँ',han:'हाँ',theek:'ठीक',thik:'ठीक',achha:'अच्छा',accha:'अच्छा',acha:'अच्छा',achchha:'अच्छा',dhanyavaad:'धन्यवाद',dhanyawad:'धन्यवाद',shukriya:'शुक्रिया',namaste:'नमस्ते',pyaar:'प्यार',pyar:'प्यार',dost:'दोस्त',bhai:'भाई',bahut:'बहुत',sab:'सब',kuch:'कुछ',aur:'और',ya:'या',par:'पर',se:'से',ko:'को',ka:'का',ki:'की',ke:'के',ne:'ने',ho:'हो',hoon:'हूँ',hun:'हूँ',tha:'था',thi:'थी',the:'थे',raha:'रहा',rahi:'रही',rahe:'रहे',karna:'करना',kaam:'काम',naam:'नाम',ghar:'घर',school:'स्कूल',college:'कॉलेज',student:'स्टूडेंट',teacher:'टीचर',hindi:'हिंदी',india:'इंडिया',bharat:'भारत',aaj:'आज',kal:'कल',abhi:'अभी',subah:'सुबह',raat:'रात',paani:'पानी',khana:'खाना',chai:'चाय',paise:'पैसे',log:'लोग',is:'इस',us:'उस',yeh:'यह',ye:'ये',woh:'वह',vo:'वो',wo:'वो',jo:'जो',toh:'तो',to:'तो',bhi:'भी',hi:'ही',tak:'तक',liye:'लिए',wala:'वाला',wali:'वाली',mujhe:'मुझे',tumhe:'तुम्हें',unhe:'उन्हें',sir:'सर',madam:'मैडम',good:'गुड',morning:'मॉर्निंग',night:'नाइट',pharmacy:'फार्मेसी',lab:'लैब',exam:'एग्ज़ाम',pass:'पास',fail:'फेल'};
+function conv(word){
+  var lw=word.toLowerCase();
+  var titleCase=/^[A-Z][a-z]*$/.test(word);
+  if(DICT.hasOwnProperty(lw)&&(titleCase||word===lw))return DICT[lw];
+  if(titleCase)word=lw;
+  var out='',i=0,prevCons=false,n=word.length;
+  while(i<n){
+    var ch=word[i],done=false,k,m;
+    if(MARK[ch]){out+=MARK[ch];i++;continue;}
+    for(k=0;k<VOW.length;k++){m=VOW[k][0];
+      if(word.substr(i,m.length)===m){
+        if(prevCons){
+          if(m==='a'){if(i+1===n&&n>1)out+='ा';}
+          else out+=VOW[k][1];
+        }else out+=VOW[k][2];
+        prevCons=false;i+=m.length;done=true;break;}}
+    if(done)continue;
+    for(k=0;k<CONS.length;k++){m=CONS[k][0];
+      if(word.substr(i,m.length)===m){
+        if(prevCons)out+='्';
+        out+=CONS[k][1];prevCons=true;i+=m.length;done=true;break;}}
+    if(done)continue;
+    out+=ch;prevCons=false;i++;
+  }
+  return out;
+}
+function run(){
+  var t=$('src').value;
+  var r=t.replace(/[A-Za-z~]+/g,function(w){return conv(w);});
+  if($('dand').checked)r=r.replace(/\.(?=\s|$)/g,'।');
+  $('dst').value=r;
+}
+$('src').addEventListener('input',run);$('dand').addEventListener('change',run);
+$('copy').addEventListener('click',function(){var t=$('dst').value;if(!t){setMsg('Nothing to copy yet.','err');return;}
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){setMsg('Copied!','ok');}).catch(function(){$('dst').select();setMsg('Select the text above and copy it.');});});
+$('clr').addEventListener('click',function(){$('src').value='';$('dst').value='';setMsg('');});
+
+</script>
+</body>
+</html>

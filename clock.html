@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stopwatch, Timer and World Clock - Free</title>
+<meta name="description" content="Simple stopwatch with laps, a countdown timer with alarm, and world time for many cities.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">⏱️ tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Stopwatch, Timer and World Clock</h1>
+    <p class="sub">Simple stopwatch with laps, a countdown timer with alarm, and world time for many cities.</p>
+
+    <div class="tabs"><button class="on" data-tab="s">Stopwatch</button><button data-tab="t">Timer</button><button data-tab="w">World clock</button></div>
+    <div data-pane="s">
+      <div class="big" id="sw" style="font-size:44px;font-variant-numeric:tabular-nums">00:00.00</div>
+      <div class="btnrow"><button class="btn2" id="sstart">Start</button><button class="btn2" id="slap">Lap</button><button class="btn2" id="sreset">Reset</button></div>
+      <ol id="laps" style="margin:10px 0 0 18px"></ol>
+    </div>
+    <div data-pane="t" hidden>
+      <div class="row3">
+        <div><label class="l" for="th">Hours</label><input class="field" type="number" id="th" value="0" min="0" max="99"></div>
+        <div><label class="l" for="tm">Minutes</label><input class="field" type="number" id="tm" value="5" min="0" max="59"></div>
+        <div><label class="l" for="ts">Seconds</label><input class="field" type="number" id="ts" value="0" min="0" max="59"></div>
+      </div>
+      <div class="big" id="tdisp" style="font-size:44px;font-variant-numeric:tabular-nums">00:05:00</div>
+      <div class="btnrow"><button class="btn2" id="tstart">Start</button><button class="btn2" id="treset">Reset</button></div>
+      <div class="btnrow noprint"><button class="btn2" data-q="60">1 min</button><button class="btn2" data-q="300">5 min</button><button class="btn2" data-q="1500">25 min</button><button class="btn2" data-q="3600">1 hour</button></div>
+    </div>
+    <div data-pane="w" hidden>
+      <div id="wc"></div>
+      <p class="note">Tap a city to show or hide it.</p>
+      <div class="chips" id="wsel"></div>
+    </div>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+tabs(document.querySelector('.card'));
+function p2(n){return (n<10?'0':'')+n;}
+// stopwatch
+var st=0,acc=0,run=false,tid=null,laps=[];
+function sfmt(ms){var c=Math.floor(ms/10)%100,s=Math.floor(ms/1000)%60,m=Math.floor(ms/60000);return p2(m)+':'+p2(s)+'.'+p2(c);}
+function stick(){$('sw').textContent=sfmt(acc+(run?Date.now()-st:0));}
+$('sstart').addEventListener('click',function(){if(!run){run=true;st=Date.now();tid=setInterval(stick,30);this.textContent='Stop';}else{acc+=Date.now()-st;run=false;clearInterval(tid);this.textContent='Start';stick();}});
+$('slap').addEventListener('click',function(){var t=acc+(run?Date.now()-st:0);if(!t)return;laps.push(t);var li=document.createElement('li');li.textContent=sfmt(t);$('laps').appendChild(li);});
+$('sreset').addEventListener('click',function(){run=false;clearInterval(tid);acc=0;laps=[];$('laps').innerHTML='';$('sstart').textContent='Start';stick();});
+// timer
+var tEnd=0,tRun=false,tt=null;
+function tfmt(s){return p2(Math.floor(s/3600))+':'+p2(Math.floor(s/60)%60)+':'+p2(s%60);}
+function tset(){var s=(+$('th').value||0)*3600+(+$('tm').value||0)*60+(+$('ts').value||0);$('tdisp').textContent=tfmt(s);return s;}
+['th','tm','ts'].forEach(function(i){$(i).addEventListener('input',function(){if(!tRun)tset();});});
+function beep(){try{var a=new (window.AudioContext||window.webkitAudioContext)(),n=0;(function b(){if(n++>5)return;var o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=880;g.gain.value=.25;o.start();setTimeout(function(){o.stop();setTimeout(b,200);},300);})();}catch(e){}
+  if(navigator.vibrate)navigator.vibrate([300,150,300,150,300]);}
+$('tstart').addEventListener('click',function(){
+  if(!tRun){var s=tset();if(!s)return;tEnd=Date.now()+s*1000;tRun=true;this.textContent='Pause';
+    tt=setInterval(function(){var left=Math.max(0,Math.round((tEnd-Date.now())/1000));$('tdisp').textContent=tfmt(left);
+      if(left<=0){clearInterval(tt);tRun=false;$('tstart').textContent='Start';$('tdisp').textContent="00:00:00";setMsg("⏰ Time's up!",'ok');beep();}},200);setMsg('');}
+  else{clearInterval(tt);tRun=false;var left=Math.max(0,Math.round((tEnd-Date.now())/1000));$('th').value=Math.floor(left/3600);$('tm').value=Math.floor(left/60)%60;$('ts').value=left%60;this.textContent='Start';tset();}});
+$('treset').addEventListener('click',function(){clearInterval(tt);tRun=false;$('tstart').textContent='Start';setMsg('');tset();});
+document.querySelectorAll('[data-q]').forEach(function(b){b.addEventListener('click',function(){if(tRun)return;var s=+b.getAttribute('data-q');$('th').value=Math.floor(s/3600);$('tm').value=Math.floor(s/60)%60;$('ts').value=s%60;tset();});});
+tset();
+// world clock
+var CITIES=[['India (Delhi)','Asia/Kolkata'],['Dubai','Asia/Dubai'],['Pakistan (Karachi)','Asia/Karachi'],['Nepal (Kathmandu)','Asia/Kathmandu'],['Bangladesh (Dhaka)','Asia/Dhaka'],['Singapore','Asia/Singapore'],['Japan (Tokyo)','Asia/Tokyo'],['Saudi Arabia (Riyadh)','Asia/Riyadh'],['Egypt (Cairo)','Africa/Cairo'],['UK (London)','Europe/London'],['France (Paris)','Europe/Paris'],['USA (New York)','America/New_York'],['USA (Chicago)','America/Chicago'],['USA (Los Angeles)','America/Los_Angeles'],['Australia (Sydney)','Australia/Sydney'],['New Zealand','Pacific/Auckland']];
+var shown={};CITIES.forEach(function(c,i){shown[c[1]]=i<1||c[1]==='Europe/London'||c[1]==='America/New_York'||c[1]==='Asia/Dubai';});
+function wsel(){$('wsel').innerHTML='';CITIES.forEach(function(c){var b=document.createElement('button');b.className='chip';b.style.border=shown[c[1]]?'2px solid var(--p1)':'1px solid var(--line)';b.textContent=c[0];b.onclick=function(){shown[c[1]]=!shown[c[1]];wsel();wdraw();};$('wsel').appendChild(b);});}
+function wdraw(){var h='<table class="t">';CITIES.forEach(function(c){if(!shown[c[1]])return;var d=new Date();
+  var t=d.toLocaleTimeString('en-IN',{timeZone:c[1],hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+  var dt=d.toLocaleDateString('en-IN',{timeZone:c[1],weekday:'short',day:'numeric',month:'short'});
+  h+='<tr><td><b>'+c[0]+'</b></td><td>'+dt+'</td><td style="font-variant-numeric:tabular-nums"><b>'+t+'</b></td></tr>';});$('wc').innerHTML=h+'</table>';}
+wsel();wdraw();setInterval(wdraw,1000);
+
+</script>
+</body>
+</html>

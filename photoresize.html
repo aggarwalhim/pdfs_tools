@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exam Form Photo and Signature Resizer - KB and Pixels</title>
+<meta name="description" content="Make your photo or signature the exact size in pixels and KB that your form needs.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">📷 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Exam Photo and Signature Resizer</h1>
+    <p class="sub">Make your photo or signature the exact size in pixels and KB that your form needs.</p>
+
+    <label class="l" for="file">Choose your photo or signature</label>
+    <input class="field" type="file" id="file" accept="image/*">
+    <label class="l">Quick presets (check your form's rule, then edit the boxes)</label>
+    <div class="btnrow">
+      <button class="btn2" data-p="200,230,20,50">Photo<br><small>200×230, 20–50 KB</small></button>
+      <button class="btn2" data-p="100,120,20,50">Small photo<br><small>100×120, 20–50 KB</small></button>
+      <button class="btn2" data-p="140,60,10,20">Signature<br><small>140×60, 10–20 KB</small></button>
+    </div>
+    <div class="row2">
+      <div><label class="l" for="w">Width (px)</label><input class="field" type="number" id="w" placeholder="e.g. 200" min="10"></div>
+      <div><label class="l" for="h">Height (px)</label><input class="field" type="number" id="h" placeholder="e.g. 230" min="10"></div>
+    </div>
+    <div class="row2">
+      <div><label class="l" for="mn">Minimum size (KB)</label><input class="field" type="number" id="mn" placeholder="e.g. 20" min="0"></div>
+      <div><label class="l" for="mx">Maximum size (KB)</label><input class="field" type="number" id="mx" placeholder="e.g. 50" min="1"></div>
+    </div>
+    <p class="note">Leave width and height empty to keep the original shape. The photo is centred and cropped to fit the exact size you type.</p>
+    <canvas id="cv" class="pv" hidden></canvas>
+    <div class="out" id="info" hidden></div>
+    <button class="go" id="go" disabled>Resize</button>
+    <button class="go" id="dl" disabled style="background:#15803d;box-shadow:none">Download</button>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+var img=null,blob=null,fname='photo';
+document.querySelectorAll('[data-p]').forEach(function(b){b.addEventListener('click',function(){
+  var p=b.getAttribute('data-p').split(',');$('w').value=p[0];$('h').value=p[1];$('mn').value=p[2];$('mx').value=p[3];});});
+$('file').addEventListener('change',function(){
+  var f=this.files[0];if(!f)return;fname=f.name.replace(/\.[^.]+$/,'');
+  readImage(f).then(function(i){img=i;$('go').disabled=false;$('dl').disabled=true;setMsg('Photo loaded: '+i.width+'×'+i.height+' px. Set the size and tap Resize.');}).catch(function(){setMsg('This file is not a valid image.','err');});
+});
+function render(w,h,q){
+  var c=$('cv');c.width=w;c.height=h;var x=c.getContext('2d');
+  x.fillStyle='#fff';x.fillRect(0,0,w,h);
+  var s=Math.max(w/img.width,h/img.height),dw=img.width*s,dh=img.height*s;
+  x.drawImage(img,(w-dw)/2,(h-dh)/2,dw,dh);
+  return toBlob(c,'image/jpeg',q);
+}
+async function pad(blob,minBytes){
+  var buf=new Uint8Array(await blob.arrayBuffer()),need=minBytes+64-buf.length,parts=[buf.subarray(0,2)];
+  while(need>4){var chunk=Math.min(need-4,65533),seg=new Uint8Array(chunk+4);seg[0]=0xFF;seg[1]=0xFE;seg[2]=((chunk+2)>>8)&255;seg[3]=(chunk+2)&255;seg.fill(0x20,4);parts.push(seg);need-=chunk+4;}
+  parts.push(buf.subarray(2));return new Blob(parts,{type:'image/jpeg'});
+}
+$('go').addEventListener('click',async function(){
+  var W=parseInt($('w').value,10)||0,H=parseInt($('h').value,10)||0,mx=parseFloat($('mx').value)||0,mn=parseFloat($('mn').value)||0;
+  var fixed=W>0&&H>0;
+  if((W&&!H)||(!W&&H)){setMsg('Fill both width and height, or leave both empty.','err');return;}
+  if(!fixed){var s0=Math.min(1,1600/Math.max(img.width,img.height));W=Math.round(img.width*s0);H=Math.round(img.height*s0);}
+  setMsg('Working...');$('go').disabled=true;
+  var limit=mx?mx*1024:0,b,q=0.92,tries=0;
+  b=await render(W,H,0.95);
+  if(limit&&b.size>limit){
+    var done=false;
+    while(!done&&tries<12){
+      var lo=0.03,hi=0.95;
+      for(var i=0;i<9;i++){var mid=(lo+hi)/2;var t=await render(W,H,mid);if(t.size<=limit){lo=mid;b=t;}else{hi=mid;}}
+      var chk=await render(W,H,lo);
+      if(chk.size<=limit){b=chk;done=true;}
+      else if(!fixed){W=Math.round(W*0.85);H=Math.round(H*0.85);tries++;}
+      else{b=chk;break;}
+    }
+  }
+  var padded=false;
+  if(mn&&b.size<mn*1024&&(!limit||mn*1024<=limit)){b=await pad(b,mn*1024);padded=true;}
+  blob=b;$('cv').hidden=false;
+  var msg='Size: '+W+'×'+H+' px, '+kb(b.size);
+  var ok=true;
+  if(limit&&b.size>limit){msg+=' — still above '+mx+' KB. Try a smaller width and height.';ok=false;}
+  if(mn&&b.size<mn*1024){msg+=' — below the minimum '+mn+' KB. Use a bigger width and height.';ok=false;}
+  if(ok&&(limit||mn))msg+=' ✔ within your limits.';
+  if(padded&&ok)msg+=' (The picture was already at best quality, so harmless empty data was added inside the file to reach the minimum size. The picture looks the same.)';
+  $('info').hidden=false;$('info').textContent=msg;
+  $('dl').disabled=false;$('go').disabled=false;setMsg('');
+});
+$('dl').addEventListener('click',function(){if(blob)download(blob,fname+'-resized.jpg');});
+
+</script>
+</body>
+</html>

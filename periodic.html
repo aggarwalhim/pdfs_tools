@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Periodic Table with Atomic Mass and Details - Free</title>
+<meta name="description" content="Tap an element to see its atomic number, mass, type and its role in the body or medicine.">
+<link rel="stylesheet" href="style.css">
+<script src="chem.js"></script>
+<style>.ptwrap{overflow-x:auto;margin-top:10px;padding-bottom:6px}.pt{display:grid;grid-template-columns:repeat(18,44px);grid-auto-rows:46px;gap:2px;width:max-content}.el{border:0;border-radius:6px;padding:1px;font-family:inherit;color:#1e2433;cursor:pointer;line-height:1.05;display:flex;flex-direction:column;align-items:center;justify-content:center}.el small{font-size:9px;opacity:.75}.el b{font-size:14px}.el.sel{outline:3px solid #4f46e5}.el.dim{opacity:.18}.lg{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:12px}.lg span{padding:3px 8px;border-radius:99px;color:#1e2433}#det{display:grid;grid-template-columns:90px 1fr;gap:12px;align-items:center}#det .big2{font-size:44px;font-weight:800;border-radius:12px;text-align:center;padding:10px 0;color:#1e2433}</style>
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">⚛️ tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Periodic Table</h1>
+    <p class="sub">Tap an element to see its atomic number, mass, type and its role in the body or medicine.</p>
+
+    <input class="field" type="search" id="q" placeholder="Search: Na, iron, 26..." style="margin-top:0">
+    <div class="out" id="det"><div class="big2" id="dsym" style="background:#eef0ff">?</div><div id="dtxt">Tap any element to see its details.</div></div>
+    <div class="ptwrap"><div class="pt" id="pt"></div></div>
+    <div class="lg" id="lg"></div>
+    <p class="note">Atomic masses are standard atomic weights. A number in [ ] is the mass number of the longest-lived isotope (element has no stable form).</p>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+var CATS={'alkali':['Alkali metal','#ffb3b3'],'alkaline':['Alkaline earth','#ffd7a8'],'trans':['Transition metal','#ffe99a'],'post':['Post-transition metal','#cfe8a9'],'meta':['Metalloid','#a8e6cf'],'non':['Nonmetal','#a8d8ff'],'hal':['Halogen','#c9c3ff'],'noble':['Noble gas','#f1b8ff'],'lan':['Lanthanide','#ffc9e0'],'act':['Actinide','#e8c6a8']};
+function cat(z){
+  if([3,11,19,37,55,87].indexOf(z)>-1)return 'alkali';
+  if([4,12,20,38,56,88].indexOf(z)>-1)return 'alkaline';
+  if(z>=57&&z<=71)return 'lan';if(z>=89&&z<=103)return 'act';
+  if([5,14,32,33,51,52].indexOf(z)>-1)return 'meta';
+  if([1,6,7,8,15,16,34].indexOf(z)>-1)return 'non';
+  if([9,17,35,53,85,117].indexOf(z)>-1)return 'hal';
+  if([2,10,18,36,54,86,118].indexOf(z)>-1)return 'noble';
+  if([13,31,49,50,81,82,83,84,113,114,115,116].indexOf(z)>-1)return 'post';
+  return 'trans';}
+function pos(z){
+  if(z===1)return [1,1];if(z===2)return [1,18];
+  if(z<=4)return [2,z-2];if(z<=10)return [2,z+8];
+  if(z<=12)return [3,z-10];if(z<=18)return [3,z];
+  if(z<=36)return [4,z-18];if(z<=54)return [5,z-36];
+  if(z<=56)return [6,z-54];if(z<=71)return [9,z-54];
+  if(z<=86)return [6,z-68];
+  if(z<=88)return [7,z-86];if(z<=103)return [10,z-86];
+  return [7,z-100];}
+var GAS=[1,2,7,8,9,10,17,18,36,54,86],LIQ=[35,80];
+var MED={1:'Part of water and every organic molecule.',3:'Lithium salts are used in medicine for bipolar disorder.',6:'Backbone of all organic compounds and drugs.',7:'In proteins and DNA. Nitrous oxide is a gas used in anaesthesia.',8:'Needed for breathing. Medical oxygen is a common therapy.',9:'Fluoride helps protect tooth enamel.',11:'Controls body fluid balance and nerve signals.',12:'Needed by many enzymes, muscles and nerves. Used in antacids and laxatives.',13:'Aluminium hydroxide is used as an antacid.',15:'In bones, DNA and ATP (energy molecule).',16:'In some amino acids. Sulfa drugs contain sulfur.',17:'Chloride is part of stomach acid (HCl) and body salts.',19:'Needed for nerves, muscles and heartbeat.',20:'Builds bones and teeth. Needed for muscle action and blood clotting.',25:'Trace element needed by some enzymes.',26:'Part of haemoglobin, which carries oxygen in blood.',27:'Centre of vitamin B12.',29:'Trace element for many enzymes. Excess is toxic.',30:'Needed for enzymes, healing and immunity.',34:'Trace element in antioxidant enzymes.',47:'Silver compounds are used in burn creams (silver sulfadiazine).',53:'Needed to make thyroid hormones. Used as an antiseptic (povidone-iodine).',56:'Barium sulfate is used as an X-ray contrast (barium meal). Soluble barium salts are poisonous.',78:'Platinum compounds such as cisplatin are used in cancer treatment.',79:'Gold compounds were used for rheumatoid arthritis.',80:'Toxic. Mercury compounds are no longer used in most medicines.',82:'Toxic heavy metal. Lead poisoning affects blood and nerves.',83:'Bismuth subsalicylate is used for stomach upset.',33:'Toxic. Some arsenic compounds were used in old medicines.',43:'Technetium-99m is widely used in diagnostic scans.'};
+var pt=$('pt'),sel=null;
+EL.forEach(function(e,i){
+  var z=i+1,p=pos(z),b=document.createElement('button');
+  b.className='el';b.dataset.z=z;b.style.gridRow=p[0];b.style.gridColumn=p[1];b.style.background=CATS[cat(z)][1];
+  b.innerHTML='<small>'+z+'</small><b>'+e[0]+'</b>';b.title=e[1];b.onclick=function(){show(z);};pt.appendChild(b);});
+[[6,3,'57-71'],[7,3,'89-103']].forEach(function(r){var d=document.createElement('div');d.style.cssText='grid-row:'+r[0]+';grid-column:'+r[1]+';font-size:10px;display:flex;align-items:center;justify-content:center;color:var(--muted)';d.textContent=r[2];pt.appendChild(d);});
+function show(z){
+  var e=EL[z-1],c=cat(z),p=pos(z);
+  if(sel)sel.classList.remove('sel');sel=pt.querySelector('[data-z="'+z+'"]');sel.classList.add('sel');
+  var s=$('dsym');s.textContent=e[0];s.style.background=CATS[c][1];
+  var state=GAS.indexOf(z)>-1?'Gas':LIQ.indexOf(z)>-1?'Liquid':'Solid';
+  if(z===85||z===87)state='Solid (very unstable)';
+  if(z>=104)state='Not known (made in labs, very unstable)';
+  var grp=(p[0]>=9)?'f-block':p[1],per=(p[0]>=9)?(p[0]===9?6:7):p[0];
+  var h='<b style="font-size:18px">'+e[1]+'</b><br>Atomic number: <b>'+z+'</b><br>Atomic mass: <b>'+(e[3]?'['+e[2]+']':e[2])+'</b><br>Type: '+CATS[c][0]+'<br>Period '+per+', Group '+grp+'<br>State at room temperature: '+state;
+  if(MED[z])h+='<br><i>In medicine and the body: '+MED[z]+'</i>';
+  $('dtxt').innerHTML=h;}
+var lg=$('lg');Object.keys(CATS).forEach(function(k){var s=document.createElement('span');s.style.background=CATS[k][1];s.textContent=CATS[k][0];lg.appendChild(s);});
+$('q').addEventListener('input',function(){var v=this.value.trim().toLowerCase(),found=0,first=0;
+  pt.querySelectorAll('.el').forEach(function(b){var z=+b.dataset.z,e=EL[z-1],hit=!v||e[0].toLowerCase()===v||e[1].toLowerCase().indexOf(v)>-1||String(z)===v;b.classList.toggle('dim',!hit);if(hit&&v){found++;if(!first)first=z;}});
+  if(found===1)show(first);});
+
+</script>
+</body>
+</html>

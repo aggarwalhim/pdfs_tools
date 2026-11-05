@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compress and Convert Images Online - JPG PNG WebP</title>
+<meta name="description" content="Make photos smaller or change JPG, PNG and WebP. Free and private.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">🗜️ tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Compress and Convert Photos</h1>
+    <p class="sub">Make photos smaller or change JPG, PNG and WebP. Free and private.</p>
+
+    <label class="l" for="files">Choose photos (you can pick many)</label>
+    <input class="field" type="file" id="files" accept="image/*" multiple>
+    <div class="row2">
+      <div><label class="l" for="fmt">Convert to</label>
+        <select class="field" id="fmt" style="margin-top:0">
+          <option value="image/jpeg">JPG</option><option value="image/webp">WebP</option><option value="image/png">PNG</option>
+        </select></div>
+      <div><label class="l" for="maxw">Max width (px, optional)</label><input class="field" type="number" id="maxw" placeholder="e.g. 1200" min="50" style="margin-top:0"></div>
+    </div>
+    <label class="l" for="q">Quality: <span id="qv">75</span>% (JPG and WebP only)</label>
+    <input type="range" id="q" min="10" max="100" value="75" style="width:100%">
+    <button class="go" id="go" disabled>Compress and Convert</button>
+    <div id="res"></div>
+    <p class="note">PNG keeps full quality, so its size may not shrink. Choose JPG or WebP for smaller files.</p>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+var files=[];
+$('q').addEventListener('input',function(){$('qv').textContent=this.value;});
+$('files').addEventListener('change',function(){files=Array.prototype.slice.call(this.files);$('go').disabled=!files.length;$('res').innerHTML='';setMsg(files.length?files.length+' photo(s) selected.':'');});
+function ext(t){return t==='image/png'?'png':t==='image/webp'?'webp':'jpg';}
+$('go').addEventListener('click',async function(){
+  var t=$('fmt').value,q=parseInt($('q').value,10)/100,mw=parseInt($('maxw').value,10)||0;
+  $('go').disabled=true;setMsg('Working...');$('res').innerHTML='';
+  var rows='';var n=0;
+  for(var k=0;k<files.length;k++){
+    var f=files[k];
+    try{
+      var im=await readImage(f),s=1;
+      if(mw&&im.width>mw)s=mw/im.width;
+      var c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+      var x=c.getContext('2d');
+      if(t==='image/jpeg'){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);}
+      x.drawImage(im,0,0,c.width,c.height);
+      var b=await toBlob(c,t,q);
+      if(!b){rows+='<tr><td>'+esc(f.name)+'</td><td colspan=3>This format is not supported on your phone.</td></tr>';continue;}
+      var name=f.name.replace(/\.[^.]+$/,'')+'-small.'+ext(t);
+      var url=URL.createObjectURL(b);
+      var chg=Math.round((1-b.size/f.size)*100);
+      rows+='<tr><td>'+esc(f.name)+'</td><td>'+kb(f.size)+'</td><td>'+kb(b.size)+(chg>0?' ('+chg+'% smaller)':'')+'</td><td><a href="'+url+'" download="'+esc(name)+'">Download</a></td></tr>';
+      n++;
+    }catch(e){rows+='<tr><td>'+esc(f.name)+'</td><td colspan=3>Not a valid image.</td></tr>';}
+  }
+  $('res').innerHTML='<table class="t"><tr><th>File</th><th>Before</th><th>After</th><th></th></tr>'+rows+'</table>';
+  setMsg('Done: '+n+' file(s) ready.','ok');$('go').disabled=false;
+});
+
+</script>
+</body>
+</html>

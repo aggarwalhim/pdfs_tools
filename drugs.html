@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drug Name Search and Common Lab Reagents - Pharmacy Students</title>
+<meta name="description" content="Search generic and brand names, drug class and use. Also a list of common lab reagents with molecular weight and safety.">
+<link rel="stylesheet" href="style.css">
+<script src="chem.js"></script><script src="drugs-data.js"></script>
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">💊 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Drug Search and Lab Reagents</h1>
+    <p class="sub">Search generic and brand names, drug class and use. Also a list of common lab reagents with molecular weight and safety.</p>
+
+    <div class="tabs"><button class="on" data-tab="d">Drug search</button><button data-tab="r">Common lab reagents</button></div>
+    <div data-pane="d">
+      <input class="field" type="search" id="dq" placeholder="Search a drug, brand, class or use (e.g. fever)" style="margin-top:0">
+      <div class="note" id="dc"></div>
+      <div id="dl"></div>
+    </div>
+    <div data-pane="r" hidden>
+      <input class="field" type="search" id="rq" placeholder="Search reagent, formula or use" style="margin-top:0">
+      <div id="rl"></div>
+    </div>
+    <div class="warn">For learning only. This is a short list of common drugs written from standard pharmacology knowledge. Brand names change between companies. Always check a standard book (IP, BNF, KD Tripathi, CIMS) and never use this for treating a patient.</div>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+tabs(document.querySelector('.card'));
+function ok(s,q){return s.toLowerCase().indexOf(q)>-1;}
+function drugs(){
+  var q=$('dq').value.trim().toLowerCase(),h='',n=0;
+  DRUGS.forEach(function(d){
+    if(q&&!(ok(d[0],q)||ok(d[1].join(' '),q)||ok(d[2],q)||ok(d[3],q)))return;n++;
+    h+='<div class="out"><b>'+esc(d[0])+'</b><br><small style="color:var(--muted)">Brands (India): '+esc(d[1].join(', '))+'</small><br><span class="chip">'+esc(d[2])+'</span><br>Use: '+esc(d[3])+'</div>';});
+  $('dc').textContent=n+' of '+DRUGS.length+' drugs shown';$('dl').innerHTML=h||'<div class="out">Nothing found.</div>';}
+$('dq').addEventListener('input',drugs);drugs();
+var RE=[
+['Hydrochloric acid','HCl','Strong acid for titrations (standard 0.1 to 1 N) and pH adjusting','Corrosive; fumes. Use in fume hood'],
+['Sulfuric acid','H2SO4','Strong acid, dehydrating agent, digestion','Strongly corrosive. Always add acid to water'],
+['Nitric acid','HNO3','Oxidising acid, sample digestion','Corrosive and oxidiser'],
+['Phosphoric acid','H3PO4','Buffers and pH adjusting','Corrosive'],
+['Glacial acetic acid','CH3COOH','Solvent, acid, non-aqueous titration','Corrosive, flammable'],
+['Sodium hydroxide','NaOH','Strong base titrant; standardised with KHP or oxalic acid','Corrosive. Absorbs CO2 and water'],
+['Potassium hydroxide','KOH','Strong base, alcoholic KOH for saponification','Corrosive'],
+['Ammonia solution','NH3','Buffer (with NH4Cl), reagent for precipitation','Corrosive; irritating fumes'],
+['Sodium carbonate','Na2CO3','Primary standard for acids','Irritant'],
+['Sodium bicarbonate','NaHCO3','Mild base, antacid tests, buffers','Low hazard'],
+['Sodium chloride','NaCl','Isotonic solutions, chloride tests','Low hazard'],
+['Potassium permanganate','KMnO4','Oxidising titrant (permanganometry), self indicator','Oxidiser; stains skin'],
+['Potassium dichromate','K2Cr2O7','Oxidising agent, primary standard','Toxic and carcinogenic; oxidiser'],
+['Oxalic acid dihydrate','H2C2O4·2H2O','Primary standard for NaOH and KMnO4','Toxic if swallowed; irritant'],
+['Potassium hydrogen phthalate (KHP)','KHC8H4O4','Primary standard for bases','Low hazard'],
+['Sodium thiosulfate pentahydrate','Na2S2O3·5H2O','Titrant in iodometry','Low hazard'],
+['Iodine','I2','Iodimetry, oxidising agent','Harmful; stains'],
+['Disodium EDTA dihydrate','C10H14N2Na2O8·2H2O','Complexometric titration of Ca and Mg (water hardness)','Irritant'],
+['Silver nitrate','AgNO3','Argentometric titration, chloride test','Corrosive; stains skin; oxidiser'],
+['Barium chloride dihydrate','BaCl2·2H2O','Sulfate test','Toxic'],
+['Copper sulfate pentahydrate','CuSO4·5H2O','Benedict and Fehling reagents, biuret test','Harmful; hazardous to water life'],
+['Mohr salt (Ferrous ammonium sulfate hexahydrate)','Fe(NH4)2(SO4)2·6H2O','Stable Fe(II) standard in redox titrations','Low hazard'],
+['Sodium nitrite','NaNO2','Titrant in nitrite (diazotisation) titration','Toxic; oxidiser'],
+['Boric acid','H3BO3','Buffers, mild antiseptic solutions','Handle with care; avoid ingesting'],
+['Magnesium sulfate heptahydrate','MgSO4·7H2O','Reagent, drying agent','Low hazard'],
+['Hydrogen peroxide','H2O2','Oxidiser, antiseptic (3% solution)','Corrosive at high strength; oxidiser'],
+['Phenolphthalein','C20H14O4','Indicator: colourless to pink, pH 8.2 to 10.0','Handle with care (suspected carcinogen as powder)'],
+['Methyl orange','C14H14N3NaO3S','Indicator: red to yellow, pH 3.1 to 4.4','Toxic if swallowed'],
+['Ethanol','C2H5OH','Solvent, extraction, disinfectant','Flammable'],
+['Methanol','CH3OH','Solvent, HPLC mobile phase','Flammable and toxic'],
+['Acetone','C3H6O','Solvent, cleaning glassware','Flammable'],
+['Chloroform','CHCl3','Solvent for extraction and TLC','Toxic, suspected carcinogen; use fume hood'],
+['Diethyl ether','C4H10O','Solvent for extraction','Extremely flammable; forms peroxides']
+];
+function reag(){
+  var q=$('rq').value.trim().toLowerCase(),h='<table class="t"><tr><th>Reagent</th><th>Formula</th><th>MW</th><th>Common use</th><th>Safety</th></tr>',n=0;
+  RE.forEach(function(r){
+    if(q&&!(ok(r[0],q)||ok(r[1],q)||ok(r[2],q)))return;n++;
+    var m=molWeight(r[1]);
+    h+='<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td><td>'+(m.error?'-':m.mw.toFixed(2))+'</td><td>'+esc(r[2])+'</td><td>'+esc(r[3])+'</td></tr>';});
+  $('rl').innerHTML=n?h+'</table>':'<div class="out">Nothing found.</div>';}
+$('rq').addEventListener('input',reag);reag();
+
+</script>
+</body>
+</html>

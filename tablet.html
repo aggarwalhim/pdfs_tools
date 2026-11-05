@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablet Weight Variation and Disintegration Time Log Sheet</title>
+<meta name="description" content="Enter tablet weights or disintegration times, get pass or fail instantly, and print a log sheet for your lab record.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">💊 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Tablet Weight Variation and Disintegration Log</h1>
+    <p class="sub">Enter tablet weights or disintegration times, get pass or fail instantly, and print a log sheet for your lab record.</p>
+
+    <div class="tabs noprint"><button class="on" data-tab="w">Weight variation</button><button data-tab="d">Disintegration time</button></div>
+    <div data-pane="w">
+      <div class="row2">
+        <div><label class="l" for="wp">Product</label><input class="field" id="wp" placeholder="e.g. Paracetamol 500 mg" style="margin-top:0"></div>
+        <div><label class="l" for="wb">Batch no.</label><input class="field" id="wb" placeholder="e.g. B-101" style="margin-top:0"></div>
+      </div>
+      <div class="row2">
+        <div><label class="l" for="wa">Analyst</label><input class="field" id="wa" style="margin-top:0"></div>
+        <div><label class="l" for="wd">Date</label><input class="field" type="date" id="wd" style="margin-top:0"></div>
+      </div>
+      <label class="l" for="ww">Weight of each tablet in mg (20 tablets). Put a space, comma or new line between numbers</label>
+      <textarea class="field" id="ww" placeholder="502 498 510 495 ..."></textarea>
+      <div class="btnrow noprint"><button class="btn2" id="wc">Calculate</button><button class="btn2" id="wp1">🖨️ Print</button><button class="btn2" id="wcsv">⬇ CSV</button></div>
+      <div id="wr"></div>
+    </div>
+    <div data-pane="d" hidden>
+      <div class="row2">
+        <div><label class="l" for="dp">Product</label><input class="field" id="dp" style="margin-top:0"></div>
+        <div><label class="l" for="db">Batch no.</label><input class="field" id="db" style="margin-top:0"></div>
+      </div>
+      <div class="row2">
+        <div><label class="l" for="dm">Medium</label><select class="field" id="dm" style="margin-top:0"><option>Water at 37 ± 2 °C</option><option>0.1 N HCl at 37 ± 2 °C</option><option>Phosphate buffer at 37 ± 2 °C</option></select></div>
+        <div><label class="l" for="dl">Limit (minutes)</label><input class="field" type="number" id="dl" value="15" min="1" style="margin-top:0"></div>
+      </div>
+      <div class="btnrow noprint"><button class="btn2" data-lim="15">Uncoated: 15 min</button><button class="btn2" data-lim="30">Film-coated: 30 min</button><button class="btn2" data-lim="60">Plain-coated: 60 min</button></div>
+      <label class="l" for="dt">Time for each of 6 tablets. Write minutes like 8.5, or as 8:30 (minutes:seconds)</label>
+      <textarea class="field" id="dt" placeholder="7:45 8:10 9:00 8:30 7:20 9:15"></textarea>
+      <div class="btnrow noprint"><button class="btn2" id="dc">Check</button><button class="btn2" id="dp1">🖨️ Print</button></div>
+      <div id="dr"></div>
+    </div>
+    <div class="warn">Weight variation limits used here: average weight 80 mg or less ±10%, more than 80 and less than 250 mg ±7.5%, 250 mg or more ±5%. The batch passes if not more than 2 tablets are outside the limit and none is outside twice the limit. Limits and disintegration times differ between IP, BP and USP and between tablet types. Check the pharmacopoeia your college follows and edit the limit if needed.</div>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+tabs(document.querySelector('.card'));
+$('wd').value=new Date().toISOString().slice(0,10);
+var lastCsv='';
+function nums(s){return s.split(/[\s,;]+/).map(parseFloat).filter(function(v){return !isNaN(v);});}
+function calcW(){
+  var w=nums($('ww').value);
+  if(w.length<2){$('wr').innerHTML='<div class="out">Enter at least 2 weights.</div>';return;}
+  var avg=w.reduce(function(a,b){return a+b;},0)/w.length;
+  var lim=avg<=80?10:avg<250?7.5:5,out=0,out2=0;
+  var h='<div class="out"><b>'+esc($('wp').value||'Product')+'</b> · Batch: '+esc($('wb').value||'-')+' · Analyst: '+esc($('wa').value||'-')+' · Date: '+esc($('wd').value)+'<br>'+w.length+' tablets · Average weight: <b>'+avg.toFixed(2)+' mg</b> · Limit: <b>±'+lim+'%</b> ('+(avg*(1-lim/100)).toFixed(2)+' to '+(avg*(1+lim/100)).toFixed(2)+' mg)</div>';
+  h+='<table class="t"><tr><th>#</th><th>Weight (mg)</th><th>Deviation %</th><th>Result</th></tr>';
+  lastCsv='No.,Weight (mg),Deviation %,Result\n';
+  w.forEach(function(v,i){var d=(v-avg)/avg*100,a=Math.abs(d),r='OK';
+    if(a>2*lim){r='Fail (more than 2x limit)';out2++;out++;}else if(a>lim){r='Outside limit';out++;}
+    h+='<tr><td>'+(i+1)+'</td><td>'+v+'</td><td>'+(d>=0?'+':'')+d.toFixed(2)+'</td><td'+(r!=='OK'?' style="color:var(--err);font-weight:700"':'')+'>'+r+'</td></tr>';
+    lastCsv+=(i+1)+','+v+','+d.toFixed(2)+','+r+'\n';});
+  h+='</table>';
+  var pass=out<=2&&out2===0;
+  h+='<div class="big" style="color:'+(pass?'var(--ok)':'var(--err)')+'">'+(pass?'✔ Complies':'✘ Does not comply')+'</div><div class="note" style="text-align:center">'+out+' tablet(s) outside the limit, '+out2+' outside twice the limit.</div>';
+  $('wr').innerHTML=h;}
+$('wc').addEventListener('click',calcW);
+$('wp1').addEventListener('click',function(){calcW();window.print();});
+$('wcsv').addEventListener('click',function(){calcW();if(lastCsv)download(new Blob([lastCsv],{type:'text/csv'}),'weight-variation.csv');});
+function toMin(t){t=t.trim();if(!t)return NaN;if(t.indexOf(':')>-1){var p=t.split(':');return parseFloat(p[0])+parseFloat(p[1]||0)/60;}return parseFloat(t);}
+function calcD(){
+  var t=$('dt').value.split(/[\s,;]+/).map(toMin).filter(function(v){return !isNaN(v);}),lim=parseFloat($('dl').value);
+  if(!t.length||isNaN(lim)){$('dr').innerHTML='<div class="out">Enter the times and the limit.</div>';return;}
+  var bad=0,h='<div class="out"><b>'+esc($('dp').value||'Product')+'</b> · Batch: '+esc($('db').value||'-')+' · Medium: '+esc($('dm').value)+' · Limit: '+lim+' min</div><table class="t"><tr><th>Tablet</th><th>Time (min)</th><th>Result</th></tr>';
+  t.forEach(function(v,i){var ok=v<=lim;if(!ok)bad++;h+='<tr><td>'+(i+1)+'</td><td>'+v.toFixed(2)+'</td><td'+(ok?'':' style="color:var(--err);font-weight:700"')+'>'+(ok?'Disintegrated in time':'Too slow')+'</td></tr>';});
+  h+='</table><div class="big" style="color:'+(bad?'var(--err)':'var(--ok)')+'">'+(bad?'✘ '+bad+' tablet(s) too slow':'✔ Complies')+'</div>';
+  if(bad&&bad<=2)h+='<div class="note" style="text-align:center">If 1 or 2 tablets fail, many pharmacopoeias allow a repeat test on 12 more tablets. Check your book.</div>';
+  $('dr').innerHTML=h;}
+$('dc').addEventListener('click',calcD);
+$('dp1').addEventListener('click',function(){calcD();window.print();});
+document.querySelectorAll('[data-lim]').forEach(function(b){b.addEventListener('click',function(){$('dl').value=b.getAttribute('data-lim');});});
+
+</script>
+</body>
+</html>

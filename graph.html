@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Graph Maker - Bar, Line and Pie Chart Online Free</title>
+<meta name="description" content="Type your numbers and get a bar, line or pie chart you can download as an image.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">📊 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Graph Maker</h1>
+    <p class="sub">Type your numbers and get a bar, line or pie chart you can download as an image.</p>
+
+    <div class="row2">
+      <div><label class="l" for="gtype">Chart type</label><select class="field" id="gtype" style="margin-top:0"><option value="bar">Bar</option><option value="line">Line</option><option value="pie">Pie</option></select></div>
+      <div><label class="l" for="gtitle">Title</label><input class="field" type="text" id="gtitle" value="My Chart" style="margin-top:0"></div>
+    </div>
+    <label class="l" for="data">Data: one row per line. Write the label, then the number(s), separated by commas</label>
+    <textarea class="field" id="data" style="font-family:monospace">Jan, 40, 30
+Feb, 55, 45
+Mar, 38, 60
+Apr, 70, 52</textarea>
+    <label class="l" for="snames">Names of the number columns (optional, comma separated)</label>
+    <input class="field" type="text" id="snames" value="Class A, Class B">
+    <div class="row2">
+      <div><label class="l" for="xl">X axis name</label><input class="field" type="text" id="xl" placeholder="Month"></div>
+      <div><label class="l" for="yl">Y axis name</label><input class="field" type="text" id="yl" placeholder="Marks"></div>
+    </div>
+    <button class="go" id="go">Draw chart</button>
+    <canvas id="cv" class="pv" width="900" height="560"></canvas>
+    <button class="go" id="dl" style="background:#15803d;box-shadow:none">Download image</button>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+var COL=['#4f46e5','#ec4899','#f59e0b','#10b981','#06b6d4','#8b5cf6','#ef4444','#84cc16'];
+var cv=$('cv'),x=cv.getContext('2d');
+function parse(){
+  var rows=$('data').value.split('\n').map(function(l){return l.trim();}).filter(Boolean).map(function(l){return l.split(/[,\t]/).map(function(s){return s.trim();});});
+  var labels=[],vals=[];
+  rows.forEach(function(r){if(r.length<2)return;var nums=r.slice(1).map(function(v){return parseFloat(v);});if(nums.some(function(v){return isNaN(v);}))return;labels.push(r[0]);vals.push(nums);});
+  var ns=0;vals.forEach(function(v){ns=Math.max(ns,v.length);});
+  var names=$('snames').value.split(',').map(function(s){return s.trim();});
+  var series=[];for(var s=0;s<ns;s++){series.push({name:names[s]||('Series '+(s+1)),data:vals.map(function(v){return v[s]===undefined?0:v[s];})});}
+  return {labels:labels,series:series};
+}
+function nice(mx){if(mx<=0)return 1;var e=Math.pow(10,Math.floor(Math.log10(mx))),f=mx/e,n=f<=1?1:f<=2?2:f<=5?5:10;return n*e;}
+function draw(){
+  var d=parse(),W=cv.width,H=cv.height;
+  x.fillStyle='#fff';x.fillRect(0,0,W,H);
+  x.fillStyle='#111';x.font='bold 28px Arial';x.textAlign='center';x.fillText($('gtitle').value,W/2,40);
+  if(!d.labels.length){x.font='20px Arial';x.fillText('Add some data first (label, number)',W/2,H/2);return;}
+  var type=$('gtype').value;
+  if(type==='pie'){
+    var tot=d.series[0].data.reduce(function(a,b){return a+Math.max(0,b);},0)||1,a0=-Math.PI/2,cx=W*0.36,cy=H*0.55,R=Math.min(W*0.3,H*0.36);
+    d.series[0].data.forEach(function(v,i){var a=Math.max(0,v)/tot*Math.PI*2;x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,R,a0,a0+a);x.closePath();x.fillStyle=COL[i%COL.length];x.fill();x.strokeStyle='#fff';x.lineWidth=2;x.stroke();
+      if(a>0.25){var m=a0+a/2;x.fillStyle='#fff';x.font='bold 18px Arial';x.textAlign='center';x.fillText(Math.round(v/tot*100)+'%',cx+Math.cos(m)*R*0.65,cy+Math.sin(m)*R*0.65+6);}a0+=a;});
+    x.textAlign='left';x.font='18px Arial';
+    d.labels.forEach(function(l,i){var y=110+i*30;if(y>H-20)return;x.fillStyle=COL[i%COL.length];x.fillRect(W*0.68,y-14,18,18);x.fillStyle='#111';x.fillText(l+' ('+d.series[0].data[i]+')',W*0.68+28,y);});
+    return;
+  }
+  var L=80,Rr=30,T=70,B=90,pw=W-L-Rr,ph=H-T-B,mx=0,mn=0;
+  d.series.forEach(function(s){s.data.forEach(function(v){mx=Math.max(mx,v);mn=Math.min(mn,v);});});
+  var top=nice(mx),steps=5,lo=mn<0?-nice(-mn):0,range=top-lo;
+  x.strokeStyle='#e5e7eb';x.lineWidth=1;x.fillStyle='#444';x.font='16px Arial';x.textAlign='right';
+  for(var i=0;i<=steps;i++){var v=lo+range*i/steps,y=T+ph-ph*i/steps;x.beginPath();x.moveTo(L,y);x.lineTo(L+pw,y);x.stroke();x.fillText(String(parseFloat(v.toPrecision(6))),L-8,y+5);}
+  x.strokeStyle='#111';x.lineWidth=2;x.beginPath();x.moveTo(L,T);x.lineTo(L,T+ph);x.lineTo(L+pw,T+ph);x.stroke();
+  var n=d.labels.length,gw=pw/n,ns=d.series.length;
+  function yp(v){return T+ph-(v-lo)/range*ph;}
+  x.textAlign='center';x.fillStyle='#444';x.font='16px Arial';
+  d.labels.forEach(function(l,i){x.fillText(l.length>12?l.slice(0,11)+'…':l,L+gw*i+gw/2,T+ph+24);});
+  if(type==='bar'){
+    var bw=Math.min(60,gw*0.8/ns);
+    d.series.forEach(function(s,k){s.data.forEach(function(v,i){var bx=L+gw*i+gw/2-bw*ns/2+bw*k;x.fillStyle=COL[k%COL.length];var y0=yp(0),y1=yp(v);x.fillRect(bx,Math.min(y0,y1),bw-2,Math.abs(y0-y1));});});
+  }else{
+    d.series.forEach(function(s,k){x.strokeStyle=COL[k%COL.length];x.lineWidth=3;x.beginPath();
+      s.data.forEach(function(v,i){var px=L+gw*i+gw/2,py=yp(v);if(i===0)x.moveTo(px,py);else x.lineTo(px,py);});x.stroke();
+      s.data.forEach(function(v,i){x.fillStyle=COL[k%COL.length];x.beginPath();x.arc(L+gw*i+gw/2,yp(v),5,0,7);x.fill();});});
+  }
+  if($('xl').value){x.fillStyle='#111';x.font='bold 18px Arial';x.textAlign='center';x.fillText($('xl').value,L+pw/2,H-48);}
+  if($('yl').value){x.save();x.translate(22,T+ph/2);x.rotate(-Math.PI/2);x.fillStyle='#111';x.font='bold 18px Arial';x.textAlign='center';x.fillText($('yl').value,0,0);x.restore();}
+  if(ns>1||d.series[0].name!=='Series 1'){x.font='16px Arial';x.textAlign='left';var lx=L;
+    d.series.forEach(function(s,k){x.fillStyle=COL[k%COL.length];x.fillRect(lx,H-30,16,16);x.fillStyle='#111';x.fillText(s.name,lx+22,H-17);lx+=x.measureText(s.name).width+50;});}
+}
+$('go').addEventListener('click',draw);
+['gtype'].forEach(function(i){$(i).addEventListener('change',draw);});
+$('dl').addEventListener('click',function(){draw();toBlob(cv,'image/png').then(function(b){download(b,'chart.png');});});
+draw();
+
+</script>
+</body>
+</html>
