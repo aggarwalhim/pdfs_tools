@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablet Weight Variation and Disintegration Time Log Sheet</title>
+<meta name="description" content="Enter tablet weights or disintegration times and get pass or fail with a printable lab log sheet.">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">🧫 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Tablet Weight Variation and Disintegration Log</h1>
+    <p class="sub">Enter tablet weights or disintegration times and get pass or fail with a printable lab log sheet.</p>
+
+    <div class="tabs"><button class="on" data-tab="w">Weight variation</button><button data-tab="d">Disintegration time</button></div>
+    <div class="row2">
+      <div><label class="l" for="prod">Product name</label><input class="field" id="prod" style="margin-top:0"></div>
+      <div><label class="l" for="batch">Batch no.</label><input class="field" id="batch" style="margin-top:0"></div>
+    </div>
+    <div class="row2">
+      <div><label class="l" for="date">Date</label><input class="field" type="date" id="date" style="margin-top:0"></div>
+      <div><label class="l" for="by">Done by</label><input class="field" id="by" style="margin-top:0"></div>
+    </div>
+    <div data-pane="w">
+      <label class="l" for="wts">Weights of tablets in mg (usually 20, separated by space, comma or new line)</label>
+      <textarea class="field" id="wts" placeholder="e.g. 502 498 510 495 ..."></textarea>
+      <button class="go" id="wgo">Calculate</button>
+      <div id="wout"></div>
+      <p class="note">Limits used: average up to 80 mg → ±10%, 80 mg to under 250 mg → ±7.5%, 250 mg or more → ±5%. Pass if not more than 2 tablets are outside the limit and none is outside twice the limit. Check your current pharmacopoeia or lab manual.</p>
+    </div>
+    <div data-pane="d" hidden>
+      <label class="l" for="dtype">Tablet type (limit in minutes)</label>
+      <select class="field" id="dtype" style="margin-top:0"><option value="15">Uncoated: 15 min</option><option value="30">Film-coated: 30 min</option><option value="60">Sugar or other coated: 60 min</option><option value="3">Dispersible or soluble: 3 min</option><option value="0">Custom limit</option></select>
+      <label class="l" for="dlim">Limit (minutes)</label><input class="field" type="number" id="dlim" value="15" min="0.5" step="any">
+      <label class="l" for="dts">Time taken by each of 6 tablets in minutes (space, comma or new line)</label>
+      <textarea class="field" id="dts" placeholder="e.g. 6.5 7 8.2 6 9 7.4"></textarea>
+      <button class="go" id="dgo">Check result</button>
+      <div id="dout"></div>
+      <p class="note">If 1 or 2 tablets fail, repeat with 12 more tablets. The batch passes if at least 16 of the 18 tablets disintegrate within the limit. Limits are common values, so check your pharmacopoeia.</p>
+    </div>
+    <div class="btnrow noprint"><button class="btn2" id="print">🖨️ Print log sheet</button><button class="btn2" id="csv">⬇ Download CSV</button></div>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+tabs(document.querySelector('.card'));
+$('date').valueAsDate=new Date();
+function nums(s){return s.split(/[\s,;]+/).map(parseFloat).filter(function(n){return !isNaN(n);});}
+var last={rows:[],head:[]};
+function hdr(){return [['Product',$('prod').value],['Batch',$('batch').value],['Date',$('date').value],['Done by',$('by').value]];}
+$('wgo').onclick=function(){
+  var w=nums($('wts').value);if(w.length<2){setMsg('Enter at least 2 weights.','err');return;}
+  var avg=w.reduce(function(a,b){return a+b;},0)/w.length,lim=avg<=80?10:avg<250?7.5:5,mn=Math.min.apply(null,w),mx=Math.max.apply(null,w),out=0,out2=0,rows='',data=[['No.','Weight (mg)','Deviation (%)','Status']];
+  w.forEach(function(v,i){var dv=(v-avg)/avg*100,ad=Math.abs(dv),st='OK';if(ad>lim*2){st='FAIL (beyond 2x limit)';out2++;out++;}else if(ad>lim){st='Outside limit';out++;}
+    rows+='<tr'+(st!=='OK'?' style="background:#fee2e2;color:#7f1d1d"':'')+'><td>'+(i+1)+'</td><td>'+v+'</td><td>'+(dv>=0?'+':'')+dv.toFixed(2)+'</td><td>'+st+'</td></tr>';data.push([i+1,v,dv.toFixed(2),st]);});
+  var pass=out<=2&&out2===0;
+  $('wout').innerHTML='<div class="out"><b>Average:</b> '+avg.toFixed(2)+' mg &nbsp; <b>Min:</b> '+mn+' &nbsp; <b>Max:</b> '+mx+'<br><b>Limit:</b> ±'+lim+'% ('+(avg*(1-lim/100)).toFixed(2)+' to '+(avg*(1+lim/100)).toFixed(2)+' mg)<br><b>Tablets outside limit:</b> '+out+'<div class="big" style="color:'+(pass?'#15803d':'#b42318')+'">'+(pass?'PASS':'FAIL')+'</div></div>'+
+    '<table class="t"><tr><th>No.</th><th>Weight (mg)</th><th>Deviation %</th><th>Status</th></tr>'+rows+'</table>';
+  last={head:hdr().concat([['Test','Weight variation'],['Average (mg)',avg.toFixed(2)],['Limit (%)','±'+lim],['Result',pass?'PASS':'FAIL']]),rows:data};setMsg('');};
+$('dtype').onchange=function(){if(this.value!=='0')$('dlim').value=this.value;};
+$('dgo').onclick=function(){
+  var t=nums($('dts').value),lim=parseFloat($('dlim').value);if(t.length<1||!(lim>0)){setMsg('Enter the times and a limit.','err');return;}
+  var fails=t.filter(function(x){return x>lim;}).length,mx=Math.max.apply(null,t),rows='',data=[['No.','Time (min)','Status']];
+  t.forEach(function(x,i){var f=x>lim;rows+='<tr'+(f?' style="background:#fee2e2;color:#7f1d1d"':'')+'><td>'+(i+1)+'</td><td>'+x+'</td><td>'+(f?'Over limit':'OK')+'</td></tr>';data.push([i+1,x,f?'Over limit':'OK']);});
+  var res=fails===0?'PASS':fails<=2?'RETEST with 12 more tablets':'FAIL';
+  $('dout').innerHTML='<div class="out"><b>Longest time:</b> '+mx+' min &nbsp; <b>Limit:</b> '+lim+' min<br><b>Tablets over limit:</b> '+fails+'<div class="big" style="color:'+(fails===0?'#15803d':'#b42318')+';font-size:22px">'+res+'</div></div><table class="t"><tr><th>No.</th><th>Time (min)</th><th>Status</th></tr>'+rows+'</table>';
+  last={head:hdr().concat([['Test','Disintegration time'],['Limit (min)',lim],['Result',res]]),rows:data};setMsg('');};
+$('print').onclick=function(){window.print();};
+$('csv').onclick=function(){if(!last.rows.length){setMsg('Calculate first, then download.','err');return;}
+  var q=function(v){return '"'+String(v).replace(/"/g,'""')+'"';};
+  var lines=last.head.map(function(r){return r.map(q).join(',');}).concat([''],last.rows.map(function(r){return r.map(q).join(',');}));
+  download(new Blob([lines.join('\n')],{type:'text/csv'}),'tablet-log.csv');setMsg('Saved.','ok');};
+
+</script>
+</body>
+</html>
