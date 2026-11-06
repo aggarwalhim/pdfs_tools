@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pharmacognosy Crude Drugs - Constituents, Morphology, Tests and Uses</title>
+<meta name="description" content="Biological source, constituents, morphology, taste and smell, chemical tests, mechanism and uses of common crude drugs.">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="study.css"><script src="study.js"></script><script src="crude-data.js"></script>
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">🌿 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Pharmacognosy: Crude Drugs</h1>
+    <p class="sub">Biological source, constituents, morphology, taste and smell, chemical tests, mechanism and uses of common crude drugs.</p>
+
+    <div class="filters">
+      <input class="field" type="search" id="q" placeholder="Search a drug, constituent, test or use..." style="margin-top:0">
+      <select class="field" id="grp" style="margin-top:0"></select>
+    </div>
+    <div class="note" id="cnt"></div>
+    <div id="list"></div>
+<div class="warn">For study only. This content is written for learning and may not cover every detail or recent change. Always check a standard textbook or pharmacopoeia, and never use it to treat a patient or yourself.</div>
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+fillSelect($('grp'),uniq(CRUDE.map(function(e){return e.g;})),'All groups');
+function hay(e){return [e.n,e.o,e.g,e.src,e.fam,e.part,e.con,e.mor,e.org,e.chem,e.phys,e.moa,e.use].join(' ').toLowerCase();}
+CRUDE.forEach(function(e){e._h=hay(e);});
+function draw(){
+  var q=$('q').value.trim().toLowerCase(),g=$('grp').value,n=0,list=$('list');
+  list.innerHTML='';
+  CRUDE.forEach(function(e,i){
+    if(g&&e.g!==g)return;if(q&&e._h.indexOf(q)<0)return;n++;
+    var d=document.createElement('details');d.className='dc';
+    d.innerHTML='<summary><b>'+esc(e.n)+'</b><span class="chip">'+esc(e.g)+'</span><small>'+esc(e.o)+'</small></summary><div class="bd">'
+      +srow('Biological source',e.src)+srow('Family',e.fam)+srow('Part used',e.part)
+      +srow('Chemical constituents',e.con)+srow('Morphology (macroscopic features)',e.mor)
+      +srow('Organoleptic properties (colour, odour, taste)',e.org)
+      +srow('Chemical tests',e.chem)+srow('Physical properties',e.phys)
+      +srow('Mechanism of action',e.moa)+srow('Uses',e.use)
+      +'<div class="links" id="lk'+i+'">'+link(gsearch(e.n+' crude drug '+e.o),'🔍 Search photos')+link(wiki(e.n),'📖 Wikipedia')+'</div></div>';
+    list.appendChild(d);
+    photoSlot(d.querySelector('#lk'+i),'crude-'+e.n,'Add your photo');
+  });
+  $('cnt').textContent=n+' of '+CRUDE.length+' crude drugs shown';
+  if(!n)list.innerHTML='<div class="out">Nothing found.</div>';
+}
+$('q').addEventListener('input',draw);$('grp').addEventListener('change',draw);draw();
+
+</script>
+</body>
+</html>

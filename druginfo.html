@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drug Reference - Mechanism, Side Effects, Interactions, Half-life</title>
+<meta name="description" content="Uses, mechanism of action, side effects, interactions, administration and half-life for common drugs.">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="study.css"><script src="study.js"></script><script src="druginfo-data.js"></script>
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">💊 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Drug Reference</h1>
+    <p class="sub">Uses, mechanism of action, side effects, interactions, administration and half-life for common drugs.</p>
+
+    <div class="filters">
+      <input class="field" type="search" id="q" placeholder="Search a drug, brand, class, use or side effect..." style="margin-top:0">
+      <select class="field" id="grp" style="margin-top:0"></select>
+    </div>
+    <div class="note" id="cnt"></div>
+    <div id="list"></div>
+<div class="warn">For study only. This content is written for learning and may not cover every detail or recent change. Always check a standard textbook or pharmacopoeia, and never use it to treat a patient or yourself.</div>
+    <p class="note">Structures: use the PubChem button for the official chemical structure of each drug. You can also add your own structure image or photo for each drug on this phone.</p>
+
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+fillSelect($('grp'),uniq(DRUGINFO.map(function(e){return e.s;})),'All drug groups');
+DRUGINFO.forEach(function(e){e._h=[e.n,e.b.join(' '),e.c,e.u,e.s,e.moa,e.adr,e.ddi,e.adm,e.t].join(' ').toLowerCase();});
+function clean(n){return n.replace(/\s*\(.*?\)/g,'').split('+')[0].trim();}
+function draw(){
+  var q=$('q').value.trim().toLowerCase(),g=$('grp').value,n=0,list=$('list');list.innerHTML='';
+  DRUGINFO.forEach(function(e,i){
+    if(g&&e.s!==g)return;if(q&&e._h.indexOf(q)<0)return;n++;
+    var nm=clean(e.n),d=document.createElement('details');d.className='dc';
+    d.innerHTML='<summary><b>'+esc(e.n)+'</b><span class="chip">'+esc(e.c)+'</span><small>Brands (India): '+esc(e.b.join(', '))+'</small></summary><div class="bd">'
+      +srow('Uses and indications',e.u)+srow('Mechanism of action',e.moa)+srow('Side effects',e.adr)
+      +srow('Drug interactions',e.ddi)+srow('Administration',e.adm)+srow('Half-life',e.t)
+      +'<div class="links" id="lk'+i+'">'+link(pubchem(nm),'🧬 Structure (PubChem)')+link(gsearch(nm+' chemical structure'),'🔍 Structure images')+link(wiki(nm),'📖 Wikipedia')+'</div></div>';
+    list.appendChild(d);
+    photoSlot(d.querySelector('#lk'+i),'drug-'+e.n,'Add your structure image');
+  });
+  $('cnt').textContent=n+' of '+DRUGINFO.length+' drugs shown';
+  if(!n)list.innerHTML='<div class="out">Nothing found.</div>';
+}
+$('q').addEventListener('input',draw);$('grp').addEventListener('change',draw);draw();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pathophysiology of Common Diseases - Causes, Treatment and Prevention</title>
+<meta name="description" content="Causes, pathology, symptoms, diagnosis, treatment with mechanism of action, contraindications, home care and prevention.">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="study.css"><script src="study.js"></script><script src="disease-data.js"></script>
+</head>
+<body class="hub">
+<header>
+  <div class="brand"><a href="index.html" style="color:#fff;text-decoration:none">🩺 tool4all_U</a></div>
+  <p>Free, private and works on your phone</p>
+</header>
+<main style="padding-top:14px">
+  <a class="back" href="index.html">← All tools</a>
+  <div class="card" style="margin-top:6px">
+    <h1>Pathophysiology: Diseases</h1>
+    <p class="sub">Causes, pathology, symptoms, diagnosis, treatment with mechanism of action, contraindications, home care and prevention.</p>
+
+    <div class="filters">
+      <input class="field" type="search" id="q" placeholder="Search a disease, cause, symptom or drug..." style="margin-top:0">
+      <select class="field" id="grp" style="margin-top:0"></select>
+    </div>
+    <div class="note" id="cnt"></div>
+    <div id="list"></div>
+<div class="warn">For study only. This content is written for learning and may not cover every detail or recent change. Always check a standard textbook or pharmacopoeia, and never use it to treat a patient or yourself.</div>
+    <div id="msg"></div>
+  </div>
+</main>
+<footer>Your files stay on your device. Made with ❤ for students.</footer>
+<script src="common.js"></script>
+<script>
+
+fillSelect($('grp'),uniq(DIS.map(function(e){return e.sys;})),'All body systems');
+DIS.forEach(function(e){e._h=[e.n,e.sys,e.d,e.cause,e.risk,e.patho,e.sx,e.dx,e.rx,e.ci,e.home,e.prev,e.meds.map(function(m){return m.join(' ');}).join(' ')].join(' ').toLowerCase();});
+function draw(){
+  var q=$('q').value.trim().toLowerCase(),g=$('grp').value,n=0,list=$('list');list.innerHTML='';
+  DIS.forEach(function(e){
+    if(g&&e.sys!==g)return;if(q&&e._h.indexOf(q)<0)return;n++;
+    var t='<table class="t"><tr><th>Drug class</th><th>Examples</th><th>Mechanism of action</th></tr>'+e.meds.map(function(m){return '<tr><td>'+esc(m[0])+'</td><td>'+esc(m[1])+'</td><td>'+esc(m[2])+'</td></tr>';}).join('')+'</table>';
+    var d=document.createElement('details');d.className='dc';
+    d.innerHTML='<summary><b>'+esc(e.n)+'</b><span class="chip">'+esc(e.sys)+'</span></summary><div class="bd">'
+      +srow('What it is',e.d)+srow('Causes (etiology)',e.cause)+srow('Risk factors',e.risk)
+      +srow('Pathophysiology (how the disease develops)',e.patho)+srow('Signs and symptoms',e.sx)+srow('Diagnosis',e.dx)
+      +srow('Treatment approach',e.rx)+'<div class="r"><b>Medicines and their mechanism of action</b>'+t+'</div>'
+      +srow('Contraindications and cautions',e.ci)+srow('Lifestyle and home care (supportive only)',e.home)+srow('Prevention',e.prev)
+      +'<div class="links">'+link(gsearch(e.n+' pathophysiology diagram'),'🔍 Search diagrams')+link(wiki(e.n),'📖 Wikipedia')+'</div></div>';
+    list.appendChild(d);
+  });
+  $('cnt').textContent=n+' of '+DIS.length+' diseases shown';
+  if(!n)list.innerHTML='<div class="out">Nothing found.</div>';
+}
+$('q').addEventListener('input',draw);$('grp').addEventListener('change',draw);draw();
+
+</script>
+</body>
+</html>
