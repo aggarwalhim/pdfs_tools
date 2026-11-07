@@ -76,3 +76,45 @@ table.t th{background:var(--soft)}
 .chip{background:var(--soft);color:var(--p1);padding:4px 10px;border-radius:99px;font-size:13px}
 .chip button{border:0;background:none;color:inherit;cursor:pointer;margin-left:4px}
 @media print{header,.back,.noprint,footer,button,.tabs{display:none!important}body{background:#fff;color:#000}.card{box-shadow:none;border:0}main{margin:0;padding:0}}
+
+/* ===== Professional theme (shared with the Student Tools site): navy ink, white paper, one highlighter-yellow mark ===== */
+:root{--display:Bitter,"Roboto Slab",Georgia,"Times New Roman",serif;--ink:#1b2a6b;--p1:#1b2a6b;--p2:#1b2a6b;--onp:#fff;--hl:#ffe66d;--hl-edge:#e8c928;--hl-text:#1b2a6b;--margin:#e5484d;--bg:#f2f5fb;--card:#fff;--text:#16203f;--muted:#566080;--line:#d6e0f2;--rule:#e3ebf8;--soft:#e9eefb;--ok:#157f43;--err:#c62828}
+@media (prefers-color-scheme:dark){:root{--ink:#9bb4ff;--p1:#9bb4ff;--p2:#9bb4ff;--onp:#0d1220;--hl-text:#1b2a6b;--bg:#0d1220;--card:#141b2e;--text:#e7ecfa;--muted:#9ba7c8;--line:#27324f;--rule:#1d2742;--soft:#1d2742;--ok:#4cd48a;--err:#ff8a8a}}
+body{font-size:16px}
+header{position:relative;background:repeating-linear-gradient(to bottom,transparent 0,transparent 29px,var(--rule) 29px,var(--rule) 30px),var(--card);color:var(--text);width:calc(100% - 32px);max-width:608px;margin:16px auto 0;padding:18px 18px 16px 60px;border:1px solid var(--line);border-radius:10px;text-align:left}
+header::before{content:"";position:absolute;left:42px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.75}
+header .brand{font:800 1.6rem/1.2 var(--display);letter-spacing:-.01em;color:var(--ink)}
+header .brand a{color:var(--ink)!important}
+header p{margin:4px 0 0;opacity:1;color:var(--muted);font-size:.95rem}
+.badges{justify-content:flex-start;margin-top:10px}
+.badges span{background:var(--hl);color:var(--hl-text);padding:3px 10px;border-radius:6px;font-size:.8rem;font-weight:600}
+body.hub header{padding-bottom:16px}
+main{margin-top:0}
+h1,h2.sec{font-family:var(--display);color:var(--ink)}
+h1{font-size:1.45rem;font-weight:800}
+h2.sec{font-size:1.1rem;text-transform:none;letter-spacing:0;margin:26px 2px 0;padding-bottom:5px;border-bottom:2px solid var(--ink)}
+.card{border:1px solid var(--line);border-radius:10px;box-shadow:none}
+.tile{border-radius:10px;box-shadow:none}
+.tile:hover{border-color:var(--ink);background:var(--hl);color:var(--hl-text)}
+.tile:hover small{color:var(--hl-text)}
+.tile .ico{font-size:26px}
+.tile.wide{background:var(--ink);color:var(--onp)}
+nav{box-shadow:none;border:1px solid var(--line);border-radius:10px}
+nav a.on,.tabs button.on{background:var(--hl);color:var(--hl-text);font-weight:700;border-color:var(--hl-edge)}
+button.go{background:var(--ink);color:var(--onp);box-shadow:none;border-radius:9px;min-height:46px;font-weight:600}
+button.go:hover{filter:brightness(1.12)}
+button.go:disabled{background:var(--muted);opacity:.6}
+.btn2{border-color:var(--ink);color:var(--ink);background:transparent;border-width:1.5px}
+.drop{border-color:var(--ink);background:var(--soft)}.drop b{color:var(--ink)}
+.chip{color:var(--ink)}
+.seg label:has(input:checked){border-color:var(--hl-edge);background:var(--hl);color:var(--hl-text)}
+.seg input:checked+span{color:var(--hl-text)}
+.field:focus,input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px color-mix(in srgb,var(--hl) 85%,transparent)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.back,a{color:var(--ink)}
+details.dc>summary b{font-family:var(--display)}
+details.dc[open]>summary{background:var(--hl);color:var(--hl-text)}
+details.dc[open]>summary small{color:var(--hl-text)}
+.r>b{text-transform:none;letter-spacing:0;font-size:.85rem}
+.links a,.links label{border-color:var(--ink);color:var(--ink);background:transparent}
+@media(max-width:420px){header{padding:16px 14px 14px 52px}header::before{left:36px}}
